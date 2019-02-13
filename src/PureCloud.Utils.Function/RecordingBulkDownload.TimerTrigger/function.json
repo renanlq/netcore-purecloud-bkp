@@ -1,0 +1,11 @@
+{
+    "bindings": [
+        {  
+            "authLevel": "anonymous",
+            "name": "req",
+            "type": "timerTrigger",
+            "direction": "in",
+            "schedule": "* * * * * *"
+        }
+    ]
+}
