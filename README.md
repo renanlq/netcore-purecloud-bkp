@@ -11,9 +11,9 @@
 Add utilities to PureCloud using Azure functions.
 
 ## Dependencies
-1. (Microsoft.NET.Sdk.Functions)[https://www.nuget.org/packages/Microsoft.NET.Sdk.Functions/]
-2. (Work with Azure Functions Core Tools)[https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local]
-3. (Use the Azure storage emulator for development and testing)[https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator]
+1. [Microsoft.NET.Sdk.Functions](https://www.nuget.org/packages/Microsoft.NET.Sdk.Functions/)
+2. [Work with Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
+3. [Use the Azure storage emulator for development and testing](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
 4. 
 
 ## Test
@@ -27,8 +27,8 @@ $ func start .\src\PureCloud.Utils.Function\RecordingBulkDownload.TimerTrigger\
 ```
 
 ## References
-1. (Azure Functions Documentation)[https://docs.microsoft.com/en-us/azure/azure-functions/]
-2. (Create your first function using Visual Studio Code)[https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-vs-code]
+1. [Azure Functions Documentation](https://docs.microsoft.com/en-us/azure/azure-functions/)
+2. [Create your first function using Visual Studio Code](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-vs-code)
 3. 
 
 ## Contribution
