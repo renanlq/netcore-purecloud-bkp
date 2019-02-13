@@ -11,10 +11,13 @@
 Add utilities to PureCloud using Azure functions.
 
 ## Dependencies
-1. [Microsoft.NET.Sdk.Functions](https://www.nuget.org/packages/Microsoft.NET.Sdk.Functions/)
-2. [Work with Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
-3. [Use the Azure storage emulator for development and testing](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
-4. 
+1. [Work with Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
+2. [Use the Azure storage emulator for development and testing](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
+3. [Microsoft.Azure.WebJobs.Extensions.Storage](https://www.nuget.org/packages/Microsoft.Azure.WebJobs.Extensions.Storage)
+4. [Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator](https://www.nuget.org/packages/Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator/)
+5. [Microsoft.NET.Sdk.Functions](https://www.nuget.org/packages/Microsoft.NET.Sdk.Functions/)
+6. [Microsoft.NETCore.App](https://www.nuget.org/packages/Microsoft.NETCore.App)
+7. [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/)
 
 ## Test
 Start Azure storage emulator localy:
@@ -23,7 +26,8 @@ $ storageemulator.bat
 ```
 Start function:
 ```
-$ func start .\src\PureCloud.Utils.Function\RecordingBulkDownload.TimerTrigger\
+$ cd .\src\PureCloud.Utils.Function\RecordingBulkDownload.TimerTrigger\
+$ func start
 ```
 
 ## References

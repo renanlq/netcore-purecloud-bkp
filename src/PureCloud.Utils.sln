@@ -3,17 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureCloud.Utils.CrossCutting", "PureCloud.Utils.CrossCutting\PureCloud.Utils.CrossCutting.csproj", "{2FA8990A-1A41-4624-A7B6-69496AF5F27C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PureCloud.Utils.CrossCutting", "PureCloud.Utils.CrossCutting\PureCloud.Utils.CrossCutting.csproj", "{2FA8990A-1A41-4624-A7B6-69496AF5F27C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureCloud.Utils.Domain", "PureCloud.Utils.Domain\PureCloud.Utils.Domain.csproj", "{545BB3AF-D89B-4221-920C-556CABACC265}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PureCloud.Utils.Domain", "PureCloud.Utils.Domain\PureCloud.Utils.Domain.csproj", "{545BB3AF-D89B-4221-920C-556CABACC265}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PureCloud.Utils.Function", "PureCloud.Utils.Function", "{96D51595-C8DC-4218-B0D0-19D699E11C03}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecordingBulkDownload_TimerTrigger", "PureCloud.Utils.Function\RecordingBulkDownload.TimerTrigger\RecordingBulkDownload_TimerTrigger.csproj", "{DE90A1CE-1202-4EEA-B7E7-671FDAF60032}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecordingBulkDownload_TimerTrigger", "PureCloud.Utils.Function\RecordingBulkDownload.TimerTrigger\RecordingBulkDownload_TimerTrigger.csproj", "{DE90A1CE-1202-4EEA-B7E7-671FDAF60032}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecordingDonwload_QueueTrigger", "PureCloud.Utils.Function\RecordingDownload.QueueTrigger\RecordingDonwload_QueueTrigger.csproj", "{48A78261-01CB-4CF3-8D46-52C88D743F85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecordingDonwload_QueueTrigger", "PureCloud.Utils.Function\RecordingDownload.QueueTrigger\RecordingDonwload_QueueTrigger.csproj", "{48A78261-01CB-4CF3-8D46-52C88D743F85}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureCloud.Utils.Service", "PureCloud.Utils.Service\PureCloud.Utils.Service.csproj", "{05F78358-52A2-43FD-A868-16788180DAFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PureCloud.Utils.Service", "PureCloud.Utils.Service\PureCloud.Utils.Service.csproj", "{05F78358-52A2-43FD-A868-16788180DAFA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PureCloud.Utils.Infra", "PureCloud.Utils.Infra\PureCloud.Utils.Infra.csproj", "{CC2E193B-1992-423C-B5BB-032C4954F728}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,9 +25,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{2FA8990A-1A41-4624-A7B6-69496AF5F27C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -88,9 +87,27 @@ Global
 		{05F78358-52A2-43FD-A868-16788180DAFA}.Release|x64.Build.0 = Release|Any CPU
 		{05F78358-52A2-43FD-A868-16788180DAFA}.Release|x86.ActiveCfg = Release|Any CPU
 		{05F78358-52A2-43FD-A868-16788180DAFA}.Release|x86.Build.0 = Release|Any CPU
+		{CC2E193B-1992-423C-B5BB-032C4954F728}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC2E193B-1992-423C-B5BB-032C4954F728}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC2E193B-1992-423C-B5BB-032C4954F728}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CC2E193B-1992-423C-B5BB-032C4954F728}.Debug|x64.Build.0 = Debug|Any CPU
+		{CC2E193B-1992-423C-B5BB-032C4954F728}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CC2E193B-1992-423C-B5BB-032C4954F728}.Debug|x86.Build.0 = Debug|Any CPU
+		{CC2E193B-1992-423C-B5BB-032C4954F728}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC2E193B-1992-423C-B5BB-032C4954F728}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC2E193B-1992-423C-B5BB-032C4954F728}.Release|x64.ActiveCfg = Release|Any CPU
+		{CC2E193B-1992-423C-B5BB-032C4954F728}.Release|x64.Build.0 = Release|Any CPU
+		{CC2E193B-1992-423C-B5BB-032C4954F728}.Release|x86.ActiveCfg = Release|Any CPU
+		{CC2E193B-1992-423C-B5BB-032C4954F728}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DE90A1CE-1202-4EEA-B7E7-671FDAF60032} = {96D51595-C8DC-4218-B0D0-19D699E11C03}
 		{48A78261-01CB-4CF3-8D46-52C88D743F85} = {96D51595-C8DC-4218-B0D0-19D699E11C03}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E92F8249-E74A-4048-BA9D-1354958A1DE8}
 	EndGlobalSection
 EndGlobal
