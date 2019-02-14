@@ -2,7 +2,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using PureCloud.Utils.Domain.Attribute;
-using PureCloud.Utils.Service.Queue;
+using PureCloud.Utils.Service.Storage;
 using System;
 using System.Threading.Tasks;
 
@@ -10,8 +10,6 @@ namespace PureCloud.Utils.Function
 {
     public static class ConversationRecovery
     {
-        private static string apiURI = Environment.GetEnvironmentVariable("PureCloudApi:URI", EnvironmentVariableTarget.Process);
-
         [FunctionName("ConversationRecovery")]
         [ExceptionFilter(Name = "ConversationRecovery")]
         public async static Task Run(
@@ -20,15 +18,11 @@ namespace PureCloud.Utils.Function
         {
             log.LogInformation($"Started 'ConversationRecovery': {DateTime.Now}");
 
-            // get token
-
             // 1. api/v2/analytics/conversations/details/query
 
-            // 2. add to queue conversation
-            var item = $"{DateTime.Now}";
-
+            // 2. add to "queue.conversation"
             await QueueStorageService.AddToConversationQueueAsync(
-                JsonConvert.SerializeObject($"conversation-{item}"), TimeSpan.FromSeconds(new Random().Next(30)), log);
+                JsonConvert.SerializeObject($"conversation-{DateTime.Now}"), TimeSpan.FromSeconds(new Random().Next(30)));
 
             log.LogInformation($"Ended 'ConversationRecovery': {DateTime.Now}");
         }
