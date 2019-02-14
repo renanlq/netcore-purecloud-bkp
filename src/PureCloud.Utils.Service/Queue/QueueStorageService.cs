@@ -24,7 +24,7 @@ namespace PureCloud.Utils.Service.Queue
 
         public static async Task AddToJobQueueAsync(string content, TimeSpan delay)
         {
-            var queue = await GetOrCreateQueueAsync(StorageContext.Conversation);
+            var queue = await GetOrCreateQueueAsync(StorageContext.Job);
             var message = new CloudQueueMessage(content);
             await queue.AddMessageAsync(message, null, delay, null, null);
         }
