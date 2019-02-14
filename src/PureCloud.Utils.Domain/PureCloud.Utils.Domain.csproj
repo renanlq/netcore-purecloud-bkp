@@ -3,6 +3,8 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1"/>
+    <PackageReference Include="Microsoft.Azure.WebJobs.Host.Storage" Version="*"/>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="*"/>
   </ItemGroup>
 </Project>

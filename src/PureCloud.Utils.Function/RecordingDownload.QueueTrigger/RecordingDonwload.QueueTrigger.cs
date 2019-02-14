@@ -7,12 +7,14 @@ namespace PureCloud.Utils.Function
 {
     public static class RecordingDownload
     {
-        [FunctionName("LogQueueTriggerFunction")]
-        public async static Task Run([QueueTrigger("jobs", Connection = "AzureWebJobsStorage")]string queueLog, ILogger log)
+        [FunctionName("RecordingDownload")]
+        public async static Task Run(
+            [QueueTrigger("job", Connection = "AzureWebJobsStorage")]string queueLog, 
+            ILogger log)
         {
-            log.LogInformation($"RecordingBulkDownload started: {DateTime.Now}");
+            log.LogInformation($"Started 'RecordingDownload': {DateTime.Now}");
 
-            log.LogInformation($"RecordingBulkDownload ended: {DateTime.Now}");
+            log.LogInformation($"Ended 'RecordingDownload': {DateTime.Now}");
         }
     }
 }
