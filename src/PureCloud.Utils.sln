@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureCloud.Utils.Infra", "Pu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureCloud.Utils.Service", "PureCloud.Utils.Service\PureCloud.Utils.Service.csproj", "{90A304E4-E331-4FE7-B3BC-B19F2B0085F5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecordingBatchRequest_QueueTrigger", "PureCloud.Utils.Function\RecordingBatchRequest.QueueTrigger\RecordingBatchRequest_QueueTrigger.csproj", "{7E5C50AE-C06E-45B8-B043-495BD9698927}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -102,9 +104,22 @@ Global
 		{90A304E4-E331-4FE7-B3BC-B19F2B0085F5}.Release|x64.Build.0 = Release|Any CPU
 		{90A304E4-E331-4FE7-B3BC-B19F2B0085F5}.Release|x86.ActiveCfg = Release|Any CPU
 		{90A304E4-E331-4FE7-B3BC-B19F2B0085F5}.Release|x86.Build.0 = Release|Any CPU
+		{7E5C50AE-C06E-45B8-B043-495BD9698927}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E5C50AE-C06E-45B8-B043-495BD9698927}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E5C50AE-C06E-45B8-B043-495BD9698927}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7E5C50AE-C06E-45B8-B043-495BD9698927}.Debug|x64.Build.0 = Debug|Any CPU
+		{7E5C50AE-C06E-45B8-B043-495BD9698927}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7E5C50AE-C06E-45B8-B043-495BD9698927}.Debug|x86.Build.0 = Debug|Any CPU
+		{7E5C50AE-C06E-45B8-B043-495BD9698927}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E5C50AE-C06E-45B8-B043-495BD9698927}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E5C50AE-C06E-45B8-B043-495BD9698927}.Release|x64.ActiveCfg = Release|Any CPU
+		{7E5C50AE-C06E-45B8-B043-495BD9698927}.Release|x64.Build.0 = Release|Any CPU
+		{7E5C50AE-C06E-45B8-B043-495BD9698927}.Release|x86.ActiveCfg = Release|Any CPU
+		{7E5C50AE-C06E-45B8-B043-495BD9698927}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9BBD86BA-496C-4CFA-B75A-99B7CBC4EEC5} = {271E1B95-B2C3-4D5D-BC8B-018AA850DC27}
 		{772AF424-A21A-4DE3-823C-E96AA2D4323B} = {271E1B95-B2C3-4D5D-BC8B-018AA850DC27}
+		{7E5C50AE-C06E-45B8-B043-495BD9698927} = {271E1B95-B2C3-4D5D-BC8B-018AA850DC27}
 	EndGlobalSection
 EndGlobal

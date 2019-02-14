@@ -1,0 +1,17 @@
+{
+    "IsEncrypted": false,
+    "Values": {
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "",
+        "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+        "AzureWebJobsDashboard": "UseDevelopmentStorage=true",
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+        "PureCloudAPI:URI": "https://api.mypurecloud.com/api/v2/",
+        "Queue:Convesation": "convesation",
+        "Queue:Job": "job",
+        "StorageConnectionString": ""
+    },
+    "Host": {
+      "LocalHttpPort": 7071,
+      "CORS": "*"
+    }
+}

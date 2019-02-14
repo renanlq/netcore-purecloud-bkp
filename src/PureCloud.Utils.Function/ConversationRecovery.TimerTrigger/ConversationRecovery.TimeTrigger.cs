@@ -30,18 +30,6 @@ namespace PureCloud.Utils.Function
             await QueueStorageService.AddToConversationQueueAsync(
                 JsonConvert.SerializeObject($"conversation-{item}"), TimeSpan.FromSeconds(new Random().Next(30)), log);
 
-            // ler conversations da queue, equanto tiver item
-            if (true)
-            {
-                // 3. 4. salvo o id do batch no fila job
-                await QueueStorageService.AddToJobQueueAsync(
-                    JsonConvert.SerializeObject($"job-{item}"), TimeSpan.FromSeconds(new Random().Next(30)));
-
-                // removo o item i
-                await QueueStorageService.DeleteToConversationQueueAsync(
-                    JsonConvert.SerializeObject($"conversation-{item}"), TimeSpan.FromSeconds(new Random().Next(30)));
-            }
-
             log.LogInformation($"Ended 'ConversationRecovery': {DateTime.Now}");
         }
     }
