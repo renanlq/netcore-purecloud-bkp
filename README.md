@@ -2,6 +2,7 @@
 
 ## Sumary
 * [Purpose](#purpose)
+* [Solution](#solution)
 * [Dependencies](#dependencies)
 * [Test](#test)
 * [References](#references)
@@ -9,6 +10,9 @@
 
 ## Purpose
 Add utilities to PureCloud using Azure functions.
+
+## Solution
+![Solution architecture](https://github.com/renanlq/purecloud-utils/blob/master/solution-architecture.png)
 
 ## Dependencies
 1. [Work with Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
