@@ -3,21 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureCloud.Utils.CrossCutting", "PureCloud.Utils.CrossCutting\PureCloud.Utils.CrossCutting.csproj", "{663860B2-F516-4AC3-8580-595A246D2C58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PureCloud.Utils.CrossCutting", "PureCloud.Utils.CrossCutting\PureCloud.Utils.CrossCutting.csproj", "{663860B2-F516-4AC3-8580-595A246D2C58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureCloud.Utils.Domain", "PureCloud.Utils.Domain\PureCloud.Utils.Domain.csproj", "{47F3AAB2-8F58-4B27-867A-7FDEE71F9835}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PureCloud.Utils.Domain", "PureCloud.Utils.Domain\PureCloud.Utils.Domain.csproj", "{47F3AAB2-8F58-4B27-867A-7FDEE71F9835}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PureCloud.Utils.Function", "PureCloud.Utils.Function", "{271E1B95-B2C3-4D5D-BC8B-018AA850DC27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConversationRecovery_TimerTrigger", "PureCloud.Utils.Function\ConversationRecovery.TimerTrigger\ConversationRecovery_TimerTrigger.csproj", "{9BBD86BA-496C-4CFA-B75A-99B7CBC4EEC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConversationRecovery.TimerTrigger", "PureCloud.Utils.Function\ConversationRecovery.TimerTrigger\ConversationRecovery.TimerTrigger.csproj", "{9BBD86BA-496C-4CFA-B75A-99B7CBC4EEC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecordingDonwload_QueueTrigger", "PureCloud.Utils.Function\RecordingDownload.QueueTrigger\RecordingDonwload_QueueTrigger.csproj", "{772AF424-A21A-4DE3-823C-E96AA2D4323B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecordingDonwload.QueueTrigger", "PureCloud.Utils.Function\RecordingDownload.QueueTrigger\RecordingDonwload.QueueTrigger.csproj", "{772AF424-A21A-4DE3-823C-E96AA2D4323B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureCloud.Utils.Infra", "PureCloud.Utils.Infra\PureCloud.Utils.Infra.csproj", "{90E555DD-D6D8-4933-A14C-B8D36044D65D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PureCloud.Utils.Infra", "PureCloud.Utils.Infra\PureCloud.Utils.Infra.csproj", "{90E555DD-D6D8-4933-A14C-B8D36044D65D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureCloud.Utils.Service", "PureCloud.Utils.Service\PureCloud.Utils.Service.csproj", "{90A304E4-E331-4FE7-B3BC-B19F2B0085F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PureCloud.Utils.Service", "PureCloud.Utils.Service\PureCloud.Utils.Service.csproj", "{90A304E4-E331-4FE7-B3BC-B19F2B0085F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecordingBatchRequest_QueueTrigger", "PureCloud.Utils.Function\RecordingBatchRequest.QueueTrigger\RecordingBatchRequest_QueueTrigger.csproj", "{7E5C50AE-C06E-45B8-B043-495BD9698927}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecordingBatchRequest.QueueTrigger", "PureCloud.Utils.Function\RecordingBatchRequest.QueueTrigger\RecordingBatchRequest.QueueTrigger.csproj", "{7E5C50AE-C06E-45B8-B043-495BD9698927}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,9 +27,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{663860B2-F516-4AC3-8580-595A246D2C58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -117,9 +114,15 @@ Global
 		{7E5C50AE-C06E-45B8-B043-495BD9698927}.Release|x86.ActiveCfg = Release|Any CPU
 		{7E5C50AE-C06E-45B8-B043-495BD9698927}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9BBD86BA-496C-4CFA-B75A-99B7CBC4EEC5} = {271E1B95-B2C3-4D5D-BC8B-018AA850DC27}
 		{772AF424-A21A-4DE3-823C-E96AA2D4323B} = {271E1B95-B2C3-4D5D-BC8B-018AA850DC27}
 		{7E5C50AE-C06E-45B8-B043-495BD9698927} = {271E1B95-B2C3-4D5D-BC8B-018AA850DC27}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2CFCD808-707C-4848-801A-9EA0CF26951E}
 	EndGlobalSection
 EndGlobal

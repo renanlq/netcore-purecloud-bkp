@@ -22,7 +22,8 @@ namespace PureCloud.Utils.Function
 
             // 2. add to "queue.conversation"
             await QueueStorageService.AddToConversationQueueAsync(
-                JsonConvert.SerializeObject($"conversation-{DateTime.Now}"), TimeSpan.FromSeconds(new Random().Next(30)));
+                JsonConvert.SerializeObject($"conversation-{DateTime.Now}"), 
+                                            TimeSpan.FromSeconds(new Random().Next(30)));
 
             log.LogInformation($"Ended 'ConversationRecovery': {DateTime.Now}");
         }
