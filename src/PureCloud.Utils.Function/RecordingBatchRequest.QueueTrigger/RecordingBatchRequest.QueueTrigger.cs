@@ -18,9 +18,12 @@ namespace PureCloud.Utils.Function
         {
             log.LogInformation($"Started 'RecordingBatchRequest': {DateTime.Now}");
 
-            // 3. ler "queue.conversations", equanto tiver item
+            // TODO 2. Requisitar o batch de gravações(100 em 100 do dia do passo 1): /api/v2/recording/batchrequests
+            // https://developer.mypurecloud.com/api/rest/v2/recording/#postRecordingBatchrequests
 
-            // 4. salvo o id do batch no fila "queue.job"
+            // TODO 3. ler "queue.conversations", equanto tiver item
+
+            // TODO 4. salvo o id do batch no fila "queue.job"
             await QueueStorageService.AddToJobQueueAsync(	
                 JsonConvert.SerializeObject($"job-{queuedConversation}"), TimeSpan.FromSeconds(new Random().Next(30)));	
 

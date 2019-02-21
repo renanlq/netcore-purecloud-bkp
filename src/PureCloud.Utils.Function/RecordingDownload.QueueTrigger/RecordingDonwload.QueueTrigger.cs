@@ -18,12 +18,12 @@ namespace PureCloud.Utils.Function
         {
             log.LogInformation($"Started 'RecordingDownload': {DateTime.Now}");
 
-            // 5. ler "queue.job", equanto tiver item
+            // TODO 5. ler "queue.job", equanto tiver item
 
-            // 6. salvar uri disponibilizada em storage "blob.callrecording"
-                // 6.1. se response não completo TENTAR NOVAMENTE em 10 min
+            // TODO 6. salvar uri disponibilizada em storage "blob.callrecording"
+                // TODO 6.1. se response não completo TENTAR NOVAMENTE em 10 min
 
-            
+
 
             log.LogInformation($"Ended 'RecordingDownload': {DateTime.Now}");
         }
