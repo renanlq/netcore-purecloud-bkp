@@ -2,7 +2,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using PureCloud.Utils.Domain.Attribute;
-using PureCloud.Utils.Service.Storage;
+using PureCloud.Utils.Infra.Service.Storage;
 using System;
 using System.Threading.Tasks;
 

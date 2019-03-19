@@ -9,7 +9,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PureCloud.Utils.Domain\PureCloud.Utils.Domain.csproj" />
-    <ProjectReference Include="..\PureCloud.Utils.Service\PureCloud.Utils.Service.csproj" />
+    <ProjectReference Include="..\PureCloud.Utils.Infra\PureCloud.Utils.Infra.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

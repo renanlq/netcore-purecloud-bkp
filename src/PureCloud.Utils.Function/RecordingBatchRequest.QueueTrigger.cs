@@ -2,7 +2,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using PureCloud.Utils.Domain.Attribute;
-using PureCloud.Utils.Service.Storage;
+using PureCloud.Utils.Infra.Service.Storage;
 using System;
 using System.Threading.Tasks;
 
@@ -18,7 +18,7 @@ namespace PureCloud.Utils.Function
         {
             log.LogInformation($"Started 'RecordingBatchRequest': {DateTime.Now}");
 
-            // TODO 2. Requisitar o batch de gravações(100 em 100 do dia do passo 1): /api/v2/recording/batchrequests
+            // TODO 2. Requisitar o batch de gravaï¿½ï¿½es(100 em 100 do dia do passo 1): /api/v2/recording/batchrequests
             // https://developer.mypurecloud.com/api/rest/v2/recording/#postRecordingBatchrequests
 
             // TODO 3. ler "queue.conversations", equanto tiver item

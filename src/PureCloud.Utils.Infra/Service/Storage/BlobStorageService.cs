@@ -5,7 +5,7 @@ using PureCloud.Utils.Infra.Context;
 using System;
 using System.Threading.Tasks;
 
-namespace PureCloud.Utils.Service.Storage
+namespace PureCloud.Utils.Infra.Service.Storage
 {
     public static class BlobStorageService
     {

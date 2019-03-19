@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Queue;
 using PureCloud.Utils.Infra.Context;
 
-namespace PureCloud.Utils.Service.Storage
+namespace PureCloud.Utils.Infra.Service.Storage
 {
     public static class QueueStorageService
     {

@@ -3,15 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureCloud.Utils.CrossCutting", "PureCloud.Utils.CrossCutting\PureCloud.Utils.CrossCutting.csproj", "{5186D8DE-895A-4421-AC17-11BD7B98C562}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureCloud.Utils.Domain", "PureCloud.Utils.Domain\PureCloud.Utils.Domain.csproj", "{611F94B9-6059-493B-A1CA-DD8B222FF6F2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureCloud.Utils.Function", "PureCloud.Utils.Function\PureCloud.Utils.Function.csproj", "{13526CF5-8090-42E6-89FE-2522B7AE664C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureCloud.Utils.Infra", "PureCloud.Utils.Infra\PureCloud.Utils.Infra.csproj", "{D28823E0-8B5E-4370-AD2D-84881F1A5424}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureCloud.Utils.Service", "PureCloud.Utils.Service\PureCloud.Utils.Service.csproj", "{319932CC-3C24-4C65-A013-FBD8814541C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
