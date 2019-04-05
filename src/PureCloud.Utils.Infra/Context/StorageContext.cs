@@ -1,6 +1,7 @@
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
+using Microsoft.WindowsAzure.Storage.Table;
 using System;
 
 namespace PureCloud.Utils.Infra.Context
@@ -26,6 +27,15 @@ namespace PureCloud.Utils.Infra.Context
             {
                 _cloudStorageAccount = _cloudStorageAccount ?? CloudStorageAccount.Parse(_connectionStringServer);
                 return _cloudStorageAccount.CreateCloudQueueClient();
+            }
+        }
+
+        public static CloudTableClient TableClient
+        {
+            get
+            {
+                _cloudStorageAccount = _cloudStorageAccount ?? CloudStorageAccount.Parse(_connectionStringServer);
+                return _cloudStorageAccount.CreateCloudTableClient();
             }
         }
     }

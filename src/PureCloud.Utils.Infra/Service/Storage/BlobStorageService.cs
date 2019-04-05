@@ -9,7 +9,7 @@ namespace PureCloud.Utils.Infra.Service.Storage
 {
     public static class BlobStorageService
     {
-        private static readonly string _callrecordingBlob = Environment.GetEnvironmentVariable("storage:blob:callrecording", EnvironmentVariableTarget.Process);
+        private static readonly string _callrecordingBlob = Environment.GetEnvironmentVariable("storage:blob:callrecordings", EnvironmentVariableTarget.Process);
 
         public static async Task UploadBlobAsync(string path, string name, string blob)
         {

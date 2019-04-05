@@ -8,8 +8,8 @@ namespace PureCloud.Utils.Infra.Service.Storage
 {
     public static class QueueStorageService
     {
-        private static readonly string _conversationQueue = Environment.GetEnvironmentVariable("storage:queue:convesation", EnvironmentVariableTarget.Process);
-        private static readonly string _jobQueue = Environment.GetEnvironmentVariable("storage:queue:job", EnvironmentVariableTarget.Process);
+        private static readonly string _conversationQueue = Environment.GetEnvironmentVariable("storage:queue:convesations", EnvironmentVariableTarget.Process);
+        private static readonly string _jobQueue = Environment.GetEnvironmentVariable("storage:queue:jobs", EnvironmentVariableTarget.Process);
 
 
         public static async Task AddToConversationQueueAsync(string content, TimeSpan delay)

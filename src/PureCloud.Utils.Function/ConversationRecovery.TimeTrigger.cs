@@ -18,10 +18,10 @@ namespace PureCloud.Utils.Function
         {
             log.LogInformation($"Started 'ConversationRecovery': {DateTime.Now}");
 
-            // TODO 1. api/v2/analytics/conversations/details/query
-            // https://developer.mypurecloud.com/api/rest/v2/conversations/index.html
+            // TODO 1. /api/v2/analytics/conversations/details/query
+            // https://developer.mypurecloud.com/api/rest/v2/conversations/
 
-            // TODO 2. add to "queue.conversation"
+            // TODO 2. add to "table.conversations"
             await QueueStorageService.AddToConversationQueueAsync(
                 JsonConvert.SerializeObject($"conversation-{DateTime.Now}"), 
                                             TimeSpan.FromSeconds(new Random().Next(30)));

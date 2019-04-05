@@ -4,7 +4,11 @@
     <AzureFunctionsVersion>V2</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="3.0.3" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="3.0.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="PureCloudPlatform.Client.V2" Version="54.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PureCloud.Utils.Domain\PureCloud.Utils.Domain.csproj" />
   </ItemGroup>
 </Project>
