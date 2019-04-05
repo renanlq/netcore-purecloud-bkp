@@ -9,11 +9,12 @@ namespace PureCloud.Utils.Infra.Service.Storage
 {
     public static class TableStorageService
     {
-        private static readonly string _conversationTable = Environment.GetEnvironmentVariable("storage:table:convesations", EnvironmentVariableTarget.Process);
+        private static readonly string _conversationsTable = Environment.GetEnvironmentVariable("storage:table:convesations", EnvironmentVariableTarget.Process);
+        private static readonly string _processedDatesTable = Environment.GetEnvironmentVariable("storage:table:processeddates", EnvironmentVariableTarget.Process);
 
         public static async Task AddToConversationTableAsync(Conversation content)
         {
-            var table = await GetOrCreateQueueAsync(_conversationTable);
+            var table = await GetOrCreateQueueAsync(_conversationsTable);
 
             TableOperation operation = TableOperation.Insert(content);
             operation.Entity.PartitionKey = "purecloud";
@@ -22,13 +23,13 @@ namespace PureCloud.Utils.Infra.Service.Storage
             await table.ExecuteAsync(operation);
         }
 
-        public static async Task<Conversation> GetItemNoURLToConversationTableAsync()
+        public static async Task<Conversation> GetNoProcessedItemToConversationTableAsync()
         {
-            var table = await GetOrCreateQueueAsync(_conversationTable);
+            var table = await GetOrCreateQueueAsync(_conversationsTable);
 
             TableQuery<Conversation> query = new TableQuery<Conversation>()
                                  .Where(TableQuery.GenerateFilterCondition(
-                                     "URL", QueryComparisons.Equal, null));
+                                     "Processed", QueryComparisons.Equal, "false"));
 
             var results = await table.ExecuteQuerySegmentedAsync(query, null);
             return (results.FirstOrDefault());
@@ -36,11 +37,32 @@ namespace PureCloud.Utils.Infra.Service.Storage
 
         public static async Task UpdateConversationTableAsync(Conversation content)
         {
-            var table = await GetOrCreateQueueAsync(_conversationTable);
+            var table = await GetOrCreateQueueAsync(_conversationsTable);
 
             TableOperation operation = TableOperation.Merge(content);
 
             await table.ExecuteAsync(operation);
+        }
+
+        public static async Task AddToProcessedDatesTableAsync(ProcessedDate content)
+        {
+            var table = await GetOrCreateQueueAsync(_conversationsTable);
+
+            TableOperation operation = TableOperation.Insert(content);
+            operation.Entity.PartitionKey = "purecloud";
+            operation.Entity.RowKey = Guid.NewGuid().ToString();
+
+            await table.ExecuteAsync(operation);
+        }
+
+        public static async Task<ProcessedDate> GetLastDateToProcessedDatesTableAsync()
+        {
+            var table = await GetOrCreateQueueAsync(_conversationsTable);
+
+            TableQuery<ProcessedDate> query = new TableQuery<ProcessedDate>();
+
+            var results = await table.ExecuteQuerySegmentedAsync(query, null);
+            return (results.OrderByDescending(r => r.Timestamp).FirstOrDefault());
         }
 
         private static async Task<CloudTable> GetOrCreateQueueAsync(string table)
