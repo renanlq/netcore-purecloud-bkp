@@ -1,18 +1,17 @@
-using System.Collections.Generic;
+using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 
 namespace PureCloud.Utils.Domain.Models
 {    
-    public class Recording
+    public class Recording : TableEntity
     {
-        public int id {get; set;}
-        public string name {get; set;}
-        public string selfUri {get; set;}
-        public List<BatchDownloadRequest> BatchDownloadRequests {get; set;}
-    }
+        [JsonProperty("id")]
+        public int Id {get; set;}
 
-    public class BatchDownloadRequest
-    {
-        public int conversationId {get; set;}
-        public int recordingId {get; set;}
+        [JsonProperty("name")]
+        public string Name {get; set;}
+
+        [JsonProperty("selfUri")]
+        public string SelfUri {get; set;}
     }
 }

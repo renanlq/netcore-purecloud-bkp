@@ -1,30 +1,28 @@
 using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
 namespace PureCloud.Utils.Domain.Models
-{    
+{
     public class Conversation : TableEntity
     {
-        public int conversationId {get; set;}
-        public DateTime conversationStart {get; set;}
-        public DateTime conversationEnd {get; set;}
+        [JsonProperty("conversationId")]
+        public string ConversationId { get; set; }
 
-        public List<Participant> participants { get; set; }
-        public List<string> divisionIds { get; set; }
+        [JsonProperty("conversationStart")]
+        public DateTime? ConversationStart { get; set; }
 
-        public string inteval {
-            get {
-                //"2016-06-01T00:00:00.000Z\/2016-07-01T00:00:00.000Z";
-                return conversationStart.ToString("yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'") + "\\/" + 
-                    conversationEnd.ToString("yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'");
-            }
-        }    
-        public string order {
-            get {
-                return "asc";
-            }
-        }
-        public string orderBy {get; set;}
+        [JsonProperty("conversationEnd")]
+        public DateTime? ConversationEnd { get; set; }
+
+        [JsonProperty("participants")]
+        public List<Participant> Participants { get; set; }
+
+        [JsonProperty("divisionIds")]
+        public List<string> DivisionIds { get; set; }
+
+        [JsonProperty("processed")]
+        public bool Processed { get; set; }
     }
 }

@@ -11,10 +11,10 @@ namespace PureCloud.Utils.Function
         {
             log.LogInformation($"Started 'RecordingDownload': {DateTime.Now}");
 
-            // TODO 3. ler "table.conversations", sem uridownload
-            // TODO 4. buscar "callrecording" no purecloud
-            // TODO 5. atualizar "table.conversations", com uridownload
-            // TODO 6. salvar recodingaudio em "blob.callrecordings"
+            // TODO 4. ler "table.conversations", sem uridownload
+            // TODO 5. buscar "callrecording" no purecloud
+            // TODO 6. atualizar "table.conversations", com uridownload
+            // TODO 7. salvar recodingaudio em "blob.callrecordings"
 
             log.LogInformation($"Ended 'RecordingDownload': {DateTime.Now}");
         }

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using PureCloud.Utils.Domain.Interfaces.Services;
-using PureCloudPlatform.Client.V2.Api;
+using PureCloud.Utils.Domain.Models;
 using PureCloudPlatform.Client.V2.Extensions;
 using PureCloudPlatform.Client.V2.Model;
 
@@ -40,57 +40,34 @@ namespace PureCloud.Utils.Infra.Service.Client
                     $"Basic YjIwOGZjYzUtZDUyOS00ZjY1LThmM2EtZmM4YmZjNDhjOGJmOndkWm1MMGUwV0JEM1NlMTNXNnczdEwyNVlUdmFVRE9ZLXEyQ0VyaU4xcEE=");
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-
                 Dictionary<string, string> dc = new Dictionary<string, string>();
                 dc.Add("grant_type", "client_credentials");
 
                 FormUrlEncodedContent content = new FormUrlEncodedContent(dc);
 
-                HttpResponseMessage responseMessage = await hc.PostAsync("https://login.mypurecloud.com/oauth/_token", content);
+                HttpResponseMessage responseMessage = await hc.PostAsync("https://login.mypurecloud.com/oauth/token", content);
 
                 if (responseMessage.StatusCode == HttpStatusCode.OK)
                 {
                     string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
-                    access_tokenInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<AuthTokenInfo>(jsonMessage);
+                    access_tokenInfo = JsonConvert.DeserializeObject<AuthTokenInfo>(jsonMessage);
                 }
             }
 
             _token = access_tokenInfo?.AccessToken;
         }
 
-        public async Task<List<string>> GetAllConversationQuery(int quantidade, int page, string value, DateTime data)
+        public async Task<List<Domain.Models.Conversation>> GetConversationsByInterval(DateTime begin, DateTime end)
         {
-            List<string> conversations = new List<string>();
-
-            AnalyticsApi api = new AnalyticsApi();
-
-            List<AnalyticsQueryPredicate> queryPredicate = new List<AnalyticsQueryPredicate>();
-            queryPredicate.Add(new AnalyticsQueryPredicate()
-            {
-                Type = AnalyticsQueryPredicate.TypeEnum.Dimension,
-                Dimension = AnalyticsQueryPredicate.DimensionEnum.Mediatype,
-                _Operator = AnalyticsQueryPredicate.OperatorEnum.Matches,
-                Value = value
-            });
-
-            List<AnalyticsQueryFilter> queryFilter = new List<AnalyticsQueryFilter>();
-            queryFilter.Add(new AnalyticsQueryFilter()
-            {
-                Type = AnalyticsQueryFilter.TypeEnum.Or,
-                Predicates = queryPredicate
-            });
-
             ConversationQuery queryParam = new ConversationQuery()
             {
                 //Interval = "2019-01-01T00:00:00.000Z/2019-01-31T23:59:59.999Z",
-                Interval = $"{data.ToString("yyyy-MM-dd")}T00:00:00.000Z/{data.ToString("yyyy-MM-dd")}T23:59:59.999Z",
+                Interval = $"{begin.ToString("yyyy-MM-dd")}T00:00:00.000Z/{end.ToString("yyyy-MM-dd")}T23:59:59.999Z",
                 Order = ConversationQuery.OrderEnum.Asc,
-                OrderBy = ConversationQuery.OrderByEnum.Conversationstart,
-                Paging = new PagingSpec(quantidade, page),
-                SegmentFilters = queryFilter
+                OrderBy = ConversationQuery.OrderByEnum.Conversationstart
             };
 
-            AnalyticsConversationQueryResponse response = null;
+            ConversationResponse response = new ConversationResponse();
             using (HttpClient hc = new HttpClient())
             {
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {_token}");
@@ -103,75 +80,16 @@ namespace PureCloud.Utils.Infra.Service.Client
                 if (responseMessage.StatusCode == HttpStatusCode.OK)
                 {
                     string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
-                    response = Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsConversationQueryResponse>(jsonMessage);
+                    response = JsonConvert.DeserializeObject<ConversationResponse>(jsonMessage);
                 }
             }
 
-            if (response != null)
-            {
-                conversations.AddRange(response.Conversations?.Select(c => c.ConversationId));
-
-                if (response.Conversations.Count == quantidade)
-                {
-                    conversations.AddRange(await this.GetAllConversationQuery(quantidade, page + 1, value, data));
-                }
-            }
-
-            return conversations;
+            return response.Conversations;
         }
 
-        public async Task<(string, List<string>)> GetConversationEmailsMessages(string conversationId, bool orderByAsc)
+        public Task<List<string>> GetRecordingsByConversation(string conversationId)
         {
-            List<string> emailMessages = new List<string>();
-            ConversationsApi api = new ConversationsApi();
-            EmailMessageListing response = null;
-
-            using (HttpClient hc = new HttpClient())
-            {
-                hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {_token}");
-                hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-
-                HttpResponseMessage responseMessage = await hc.GetAsync($"https://api.mypurecloud.com/api/v2/conversations/emails/{conversationId}/messages");
-
-                if (responseMessage.StatusCode == HttpStatusCode.OK)
-                {
-                    string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
-                    response = Newtonsoft.Json.JsonConvert.DeserializeObject<EmailMessageListing>(jsonMessage);
-                }
-            }
-
-            if (orderByAsc)
-            {
-                emailMessages.AddRange(response.Entities?.OrderBy(e => e.Time).Select(e => e.Id));
-            }
-            else
-            {
-                emailMessages.AddRange(response.Entities?.OrderByDescending(e => e.Time).Select(e => e.Id));
-            }
-
-            return (conversationId, emailMessages);
-        }
-
-        public async Task<(string, string)> GetConversationEmailMessageDetail(string conversationId, string messageId)
-        {
-            ConversationsApi api = new ConversationsApi();
-
-            EmailMessage emailMessage = null;
-            using (HttpClient hc = new HttpClient())
-            {
-                hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {_token}");
-                hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-
-                HttpResponseMessage responseMessage = await hc.GetAsync($"https://api.mypurecloud.com/api/v2/conversations/emails/{conversationId}/messages/{messageId}");
-
-                if (responseMessage.StatusCode == HttpStatusCode.OK)
-                {
-                    string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
-                    emailMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<EmailMessage>(jsonMessage);
-                }
-            }
-
-            return (emailMessage?.Id, emailMessage?.TextBody);
+            throw new NotImplementedException();
         }
     }
 }

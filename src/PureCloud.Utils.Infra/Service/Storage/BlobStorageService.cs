@@ -1,6 +1,4 @@
-using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.WindowsAzure.Storage.Queue;
 using PureCloud.Utils.Infra.Context;
 using System;
 using System.Threading.Tasks;

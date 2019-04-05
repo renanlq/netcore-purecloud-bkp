@@ -2,7 +2,6 @@
 using PureCloud.Utils.Domain.Models;
 using PureCloud.Utils.Infra.Context;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,6 +16,9 @@ namespace PureCloud.Utils.Infra.Service.Storage
             var table = await GetOrCreateQueueAsync(_conversationTable);
 
             TableOperation operation = TableOperation.Insert(content);
+            operation.Entity.PartitionKey = "purecloud";
+            operation.Entity.RowKey = Guid.NewGuid().ToString();
+
             await table.ExecuteAsync(operation);
         }
 
@@ -32,11 +34,12 @@ namespace PureCloud.Utils.Infra.Service.Storage
             return (results.FirstOrDefault());
         }
 
-        public static async Task UpdateToConversationTableAsync(Conversation content)
+        public static async Task UpdateConversationTableAsync(Conversation content)
         {
             var table = await GetOrCreateQueueAsync(_conversationTable);
 
-            TableOperation operation = TableOperation.InsertOrReplace(content);
+            TableOperation operation = TableOperation.Merge(content);
+
             await table.ExecuteAsync(operation);
         }
 

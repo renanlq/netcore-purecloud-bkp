@@ -1,12 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace PureCloud.Utils.Domain.Models
 {
-    public class Participant
+    public class Participant : TableEntity
     {
-        public string participantId { get; set; }
-        public string participantName { get; set; }
-        public string purpose { get; set; }
-        public List<Session> sessions { get; set; }
+        [JsonProperty("participantId")]
+        public string ParticipantId { get; set; }
+
+        [JsonProperty("participantName")]
+        public string ParticipantName { get; set; }
+
+        [JsonProperty("purpose")]
+        public string Purpose { get; set; }
+
+        [JsonProperty("sessions")]
+        public List<Session> Sessions { get; set; }
     }
 }
