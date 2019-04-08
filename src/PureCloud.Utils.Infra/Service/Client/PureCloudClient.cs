@@ -6,29 +6,21 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PureCloud.Utils.Domain.Interfaces.Services;
-using PureCloud.Utils.Domain.Models;
 using PureCloudPlatform.Client.V2.Extensions;
 using PureCloudPlatform.Client.V2.Model;
 
 namespace PureCloud.Utils.Infra.Service.Client
 {
-    
+
     public class PureCloudClient : IPureCloudService
     {
         private string _token;
+        private readonly string _uribase = "https://api.mypurecloud.com";
 
         public PureCloudClient()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             ServicePointManager.ServerCertificateValidationCallback += (s, c, h, e) => true;
-
-            //if (string.IsNullOrWhiteSpace(PureCloudPlatform.Client.V2.Client.Configuration.Default.Access_token))
-            //{
-            //    //AuthTokenInfo access_tokenInfo = Configuration.Default.ApiClient.Post_token("b208fcc5-d529-4f65-8f3a-fc8bfc48c8bf",
-            //    //"wdZmL0e0WBD3Se13W6w3tL25YTvaUDOY-q2CEriN1pA");
-            //    //PureCloudPlatform.Client.V2.Client.Configuration.Default.Access_token = access_tokenInfo?.Access_token;
-            //    PureCloudPlatform.Client.V2.Client.Configuration.Default.Access_token = _token;
-            //}
         }
 
         public async Task GetAccessToken()
@@ -36,7 +28,7 @@ namespace PureCloud.Utils.Infra.Service.Client
             AuthTokenInfo access_tokenInfo = null;
             using (HttpClient hc = new HttpClient())
             {
-                hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", 
+                hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization",
                     $"Basic YjIwOGZjYzUtZDUyOS00ZjY1LThmM2EtZmM4YmZjNDhjOGJmOndkWm1MMGUwV0JEM1NlMTNXNnczdEwyNVlUdmFVRE9ZLXEyQ0VyaU4xcEE=");
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
@@ -57,6 +49,13 @@ namespace PureCloud.Utils.Infra.Service.Client
             _token = access_tokenInfo?.AccessToken;
         }
 
+        /// <summary>
+        /// Get all conversations by interval.
+        /// Link: https://developer.mypurecloud.com/api/rest/v2/conversations/#post-api-v2-analytics-conversations-details-query
+        /// </summary>
+        /// <param name="begin">Datetime, begin date of interval</param>
+        /// <param name="end">Datetime, end date of interval</param>
+        /// <returns>List of purecloud conversations</returns>
         public async Task<List<Domain.Models.Conversation>> GetConversationsByInterval(DateTime begin, DateTime end)
         {
             ConversationQuery queryParam = new ConversationQuery()
@@ -66,30 +65,106 @@ namespace PureCloud.Utils.Infra.Service.Client
                 Order = ConversationQuery.OrderEnum.Asc,
                 OrderBy = ConversationQuery.OrderByEnum.Conversationstart
             };
+            List<Domain.Models.Conversation> response = new List<Domain.Models.Conversation>();
 
-            ConversationResponse response = new ConversationResponse();
             using (HttpClient hc = new HttpClient())
             {
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {_token}");
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-
-                HttpResponseMessage responseMessage = await hc.PostAsync("https://api.mypurecloud.com/api/v2/analytics/conversations/details/query",
+                HttpResponseMessage responseMessage = await hc.PostAsync(_uribase + "/api/v2/analytics/conversations/details/query",
                       new StringContent(queryParam.ToJson(), Encoding.UTF8, "application/json"));
 
                 if (responseMessage.StatusCode == HttpStatusCode.OK)
                 {
                     string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
-                    response = JsonConvert.DeserializeObject<ConversationResponse>(jsonMessage);
+                    response = JsonConvert.DeserializeObject<List<Domain.Models.Conversation>>(jsonMessage);
                 }
             }
 
-            return response.Conversations;
+            return response;
         }
 
-        public Task<List<string>> GetRecordingsByConversation(string conversationId)
+        /// <summary>
+        /// Batch download recordings.
+        /// Link: https://developer.mypurecloud.com/api/rest/v2/recording/#post-api-v2-recording-batchrequests
+        /// </summary>
+        /// <param name="conversationId">String, conversation id</param>
+        /// <returns>String, Job id</returns>
+        public async Task<string> BatchRecordingDownloadByConversation(string conversationId)
         {
-            throw new NotImplementedException();
+            int count = 1;
+            BatchDownloadJobSubmission queryParam = new BatchDownloadJobSubmission {
+                BatchDownloadRequestList = new List<BatchDownloadRequest>() {
+                new BatchDownloadRequest() { ConversationId = conversationId }
+            }};
+
+            BatchDownloadJobSubmissionResult response = new BatchDownloadJobSubmissionResult();
+
+            using (HttpClient hc = new HttpClient())
+            {
+                hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {_token}");
+                hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+                HttpResponseMessage responseMessage = await hc.PostAsync(_uribase + "/api/v2/recording/batchrequests",
+                    new StringContent(queryParam.ToJson(), Encoding.UTF8, "application/json"));
+
+                do
+                {
+                    if (responseMessage.StatusCode == HttpStatusCode.Accepted)
+                    {
+                        responseMessage = await hc.PostAsync(_uribase + "/api/v2/recording/batchrequests",
+                            new StringContent(queryParam.ToJson(), Encoding.UTF8, "application/json"));
+                    } 
+                    else if (responseMessage.StatusCode == HttpStatusCode.OK)
+                    {
+                        string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
+                        response = JsonConvert.DeserializeObject<BatchDownloadJobSubmissionResult>(jsonMessage);
+                    }
+
+                    count++;
+                } while (responseMessage.StatusCode == HttpStatusCode.Accepted || count < 3 
+                    && responseMessage.StatusCode != HttpStatusCode.OK);
+            }
+
+            return response.Id;
+        }
+
+        /// <summary>
+        /// Check job batch recordings download results.
+        /// Link: https://developer.mypurecloud.com/api/rest/v2/recording/#get-api-v2-recording-batchrequests--jobId-
+        /// </summary>
+        /// <param name="conversationId">String, conversation id</param>
+        /// <returns>Batch response</returns>
+        public async Task<Domain.Models.Batch> GetJobRecordingDownloadResultByConversation(string jobId)
+        {
+            int count = 1;
+            Domain.Models.Batch response = new Domain.Models.Batch();
+
+            using (HttpClient hc = new HttpClient())
+            {
+                hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {_token}");
+                hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+                HttpResponseMessage responseMessage = await hc.GetAsync(_uribase + $"/api/v2/recording/batchrequests/{jobId}");
+                do
+                {
+                    if (responseMessage.StatusCode == HttpStatusCode.Accepted)
+                    {
+                        responseMessage = await hc.GetAsync(_uribase + $"/api/v2/recording/batchrequests/{jobId}");
+                    }
+                    else if (responseMessage.StatusCode == HttpStatusCode.OK)
+                    {
+                        string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
+                        response = JsonConvert.DeserializeObject<Domain.Models.Batch>(jsonMessage);
+                    }
+
+                    count++;
+                } while (responseMessage.StatusCode == HttpStatusCode.Accepted || count < 3 
+                    && responseMessage.StatusCode != HttpStatusCode.OK);
+            }
+
+            return response;
         }
     }
 }

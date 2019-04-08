@@ -9,7 +9,7 @@ namespace PureCloud.Utils.Infra.Service.Storage
     {
         private static readonly string _callrecordingBlob = Environment.GetEnvironmentVariable("storage:blob:callrecordings", EnvironmentVariableTarget.Process);
 
-        public static async Task UploadBlobAsync(string path, string name, string blob)
+        public static async Task UploadBlobAsync(string path, string name, byte[] blob)
         {
             var container = await GetOrCreateContainerAsync();
 
@@ -19,7 +19,7 @@ namespace PureCloud.Utils.Infra.Service.Storage
             });
             var cloudBlockBlob = container.GetBlockBlobReference($"{path}/{name}");
 
-            await cloudBlockBlob.UploadTextAsync(blob);
+            await cloudBlockBlob.UploadFromByteArrayAsync(blob, 0, 0);
         }
 
         private static async Task<CloudBlobContainer> GetOrCreateContainerAsync()
