@@ -7,15 +7,18 @@ namespace PureCloud.Utils.Infra.Service.Client
     {
         public static async Task<byte[]> DownloadFileFromUrl(string url)
         {
+            byte[] file = null;
             using (var client = new HttpClient())
             {
                 using (var result = await client.GetAsync(url))
                 {
-                    if (result.IsSuccessStatusCode)
-                        return await result.Content.ReadAsByteArrayAsync();
+                    do
+                    {
+                        file = await result.Content.ReadAsByteArrayAsync();
+                    } while (!result.IsSuccessStatusCode);
                 }
             }
-            return null;
+            return file;
         }
     }
 }

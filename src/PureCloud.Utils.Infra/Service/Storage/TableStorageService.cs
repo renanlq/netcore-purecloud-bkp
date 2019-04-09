@@ -51,9 +51,13 @@ namespace PureCloud.Utils.Infra.Service.Storage
         {
             var table = await GetOrCreateQueueAsync(_conversationsTable);
 
+            //TableQuery<Conversation> query = new TableQuery<Conversation>()
+            //                     .Where(TableQuery.GenerateFilterConditionForBool(
+            //                         "Processed", QueryComparisons.Equal, false));
+
             TableQuery<Conversation> query = new TableQuery<Conversation>()
-                                 .Where(TableQuery.GenerateFilterConditionForBool(
-                                     "Processed", QueryComparisons.Equal, false));
+                     .Where(TableQuery.GenerateFilterCondition(
+                         "ConversationId", QueryComparisons.Equal, "e1ac630b-dee7-4983-9e1a-df9339b3ab47"));
 
             var results = await table.ExecuteQuerySegmentedAsync(query, null);
             return results.FirstOrDefault();

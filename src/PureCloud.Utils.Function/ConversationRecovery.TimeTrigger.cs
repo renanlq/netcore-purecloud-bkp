@@ -20,7 +20,7 @@ namespace PureCloud.Utils.Function
         {
             log.LogInformation($"Started 'ConversationRecovery': {DateTime.Now}");
 
-            //// TODO 1. pegar da "table.processeddates" adicionar 1 a data p/ processar
+            //// TODO 1. get last processed date on "table.processeddates"
             //ProcessedDate processedDate = await TableStorageService.GetLastProcessedDateTableAsync();
             //processedDate = processedDate ?? (_ = new ProcessedDate() { Date = new DateTime(2016, 06, 08) }); // inicio 2016-06-08
 

@@ -6,13 +6,13 @@ namespace PureCloud.Utils.Domain.Models
     public class Batch
     {
         [JsonProperty("id")]
-        public int? Id { get; set; }
+        public string Id { get; set; }
 
         [JsonProperty("JobId")]
         public string JobId { get; set; }
 
         [JsonProperty("expectedResultCount")]
-        public string ExpectedResultCount { get; set; }
+        public int? ExpectedResultCount { get; set; }
 
         [JsonProperty("resultCount")]
         public int? ResultCount { get; set; }

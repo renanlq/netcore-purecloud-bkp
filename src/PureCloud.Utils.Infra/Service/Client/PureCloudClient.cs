@@ -93,7 +93,7 @@ namespace PureCloud.Utils.Infra.Service.Client
         /// <returns>String, Job id</returns>
         public async Task<string> BatchRecordingDownloadByConversation(string conversationId)
         {
-            int count = 1;
+            int count = 0;
             BatchDownloadJobSubmission queryParam = new BatchDownloadJobSubmission {
                 BatchDownloadRequestList = new List<BatchDownloadRequest>() {
                 new BatchDownloadRequest() { ConversationId = conversationId }
@@ -106,17 +106,13 @@ namespace PureCloud.Utils.Infra.Service.Client
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {_token}");
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-                HttpResponseMessage responseMessage = await hc.PostAsync(_uribase + "/api/v2/recording/batchrequests",
-                    new StringContent(queryParam.ToJson(), Encoding.UTF8, "application/json"));
-
+                HttpResponseMessage responseMessage = new HttpResponseMessage();
                 do
                 {
-                    if (responseMessage.StatusCode == HttpStatusCode.Accepted)
-                    {
-                        responseMessage = await hc.PostAsync(_uribase + "/api/v2/recording/batchrequests",
-                            new StringContent(queryParam.ToJson(), Encoding.UTF8, "application/json"));
-                    } 
-                    else if (responseMessage.StatusCode == HttpStatusCode.OK)
+                    responseMessage = await hc.PostAsync(_uribase + "/api/v2/recording/batchrequests",
+                    new StringContent(queryParam.ToJson(), Encoding.UTF8, "application/json"));
+
+                    if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
                         string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
                         response = JsonConvert.DeserializeObject<BatchDownloadJobSubmissionResult>(jsonMessage);
@@ -138,7 +134,6 @@ namespace PureCloud.Utils.Infra.Service.Client
         /// <returns>Batch response</returns>
         public async Task<Domain.Models.Batch> GetJobRecordingDownloadResultByConversation(string jobId)
         {
-            int count = 1;
             Domain.Models.Batch response = new Domain.Models.Batch();
 
             using (HttpClient hc = new HttpClient())
@@ -146,25 +141,22 @@ namespace PureCloud.Utils.Infra.Service.Client
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {_token}");
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-                HttpResponseMessage responseMessage = await hc.GetAsync(_uribase + $"/api/v2/recording/batchrequests/{jobId}");
+                HttpResponseMessage responseMessage = new HttpResponseMessage();
                 do
                 {
-                    if (responseMessage.StatusCode == HttpStatusCode.Accepted)
-                    {
-                        responseMessage = await hc.GetAsync(_uribase + $"/api/v2/recording/batchrequests/{jobId}");
-                    }
-                    else if (responseMessage.StatusCode == HttpStatusCode.OK)
+                    Task.Delay(1000).Wait();
+                    responseMessage = await hc.GetAsync(_uribase + $"/api/v2/recording/batchrequests/{jobId}");
+
+                    if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
                         string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
                         response = JsonConvert.DeserializeObject<Domain.Models.Batch>(jsonMessage);
                     }
 
-                    count++;
-                } while (responseMessage.StatusCode == HttpStatusCode.Accepted || count < 3 
-                    && responseMessage.StatusCode != HttpStatusCode.OK);
+                } while (!response.ExpectedResultCount.Equals(response.ResultCount));
             }
 
-            return response;
+             return response;
         }
     }
 }
