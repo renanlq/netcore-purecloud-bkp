@@ -68,7 +68,6 @@ namespace PureCloud.Utils.Infra.Service.Client
             };
             Domain.Models.ConversationResponse response = new Domain.Models.ConversationResponse();
 
-
             using (HttpClient hc = new HttpClient())
             {
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {_token}");

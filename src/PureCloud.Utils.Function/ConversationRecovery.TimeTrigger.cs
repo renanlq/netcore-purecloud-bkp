@@ -30,10 +30,8 @@ namespace PureCloud.Utils.Function
                 PureCloudClient purecloudClient = new PureCloudClient();
                 await purecloudClient.GetAccessToken();
 
-                List<Conversation> result = await purecloudClient.GetConversationsByInterval(processedDate.Date, processedDate.Date);
-
                 // TODO 3. add to "table.conversations"
-                foreach (var item in result)
+                foreach (var item in await purecloudClient.GetConversationsByInterval(processedDate.Date, processedDate.Date))
                     await TableStorageService.AddToConversationTableAsync(item);
             }
 
