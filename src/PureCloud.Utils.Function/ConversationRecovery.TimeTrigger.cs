@@ -20,27 +20,28 @@ namespace PureCloud.Utils.Function
         {
             log.LogInformation($"Started 'ConversationRecovery': {DateTime.Now}");
 
-            //// TODO 1. get last processed date on "table.processeddates"
-            //ProcessedDate processedDate = await TableStorageService.GetLastProcessedDateTableAsync();
-            //processedDate = processedDate ?? (_ = new ProcessedDate() { Date = new DateTime(2016, 06, 08) }); // inicio 2016-06-08
+            // TODO 1. get last processed date on "table.processeddates"
+            ProcessedDate processedDate = await TableStorageService.GetLastProcessedDateTableAsync();
+            processedDate = processedDate ?? (_ = new ProcessedDate() { Date = new DateTime(2016, 06, 08) }); // inicio 2016-06-08
 
-            //// TODO 2. /api/v2/analytics/conversations/details/query
-            //PureCloudClient purecloudClient = new PureCloudClient();
-            //await purecloudClient.GetAccessToken();
+            // TODO 2. /api/v2/analytics/conversations/details/query
+            PureCloudClient purecloudClient = new PureCloudClient();
+            await purecloudClient.GetAccessToken();
 
-            //if (processedDate.Date < DateTime.Now.Date)
-            //{
-            //    List<Conversation> result = await purecloudClient.GetConversationsByInterval(processedDate.Date, processedDate.Date);
+            if (processedDate.Date < DateTime.Now.Date)
+            {
+                List<Conversation> result = await purecloudClient.GetConversationsByInterval(processedDate.Date, processedDate.Date);
 
-            //    // TODO 3. add to "table.conversations"
-            //    foreach (var item in result)
-            //        await TableStorageService.AddToConversationTableAsync(item);
-            //}
+                // TODO 3. add to "table.conversations"
+                foreach (var item in result)
+                    await TableStorageService.AddToConversationTableAsync(item);
+            }
 
-            //// TODO 4. add new date to "table.processeddates"
-            //await TableStorageService.AddToProcessedDatesTableAsync(new ProcessedDate() {
-            //    Date = processedDate.Date.AddDays(1)
-            //});
+            // TODO 4. add new date to "table.processeddates"
+            await TableStorageService.AddToProcessedDatesTableAsync(new ProcessedDate()
+            {
+                Date = processedDate.Date.AddDays(1)
+            });
 
             log.LogInformation($"Ended 'ConversationRecovery': {DateTime.Now}");
         }

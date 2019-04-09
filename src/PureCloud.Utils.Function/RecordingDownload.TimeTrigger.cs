@@ -43,10 +43,8 @@ namespace PureCloud.Utils.Function
                         // TODO 7. download file and upload to "blob.callrecordings"
                         if (!string.IsNullOrEmpty(item.ResultUrl))
                         {
-                            //byte[] blob = await WebClient.DownloadFileFromUrl(item.ResultUrl);
-                            //await BlobStorageService.UploadBlobAsync(item.ConversationId, filenameextension, blob);
-                            string filenameextension = item.RecordingId + ".ogg";
-                            await BlobStorageService.CopyFromUrlToBlobStorage(item.ResultUrl, item.ConversationId, filenameextension);
+                            await BlobStorageService.CopyFromUrlToBlobStorage(
+                                item.ResultUrl, item.ConversationId, item.RecordingId + ".ogg");
                         }
                     }
 
