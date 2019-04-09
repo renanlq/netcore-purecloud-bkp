@@ -24,12 +24,12 @@ namespace PureCloud.Utils.Function
             ProcessedDate processedDate = await TableStorageService.GetLastProcessedDateTableAsync();
             processedDate = processedDate ?? (_ = new ProcessedDate() { Date = new DateTime(2016, 06, 08) }); // inicio 2016-06-08
 
-            // TODO 2. /api/v2/analytics/conversations/details/query
-            PureCloudClient purecloudClient = new PureCloudClient();
-            await purecloudClient.GetAccessToken();
-
             if (processedDate.Date < DateTime.Now.Date)
             {
+                // TODO 2. /api/v2/analytics/conversations/details/query
+                PureCloudClient purecloudClient = new PureCloudClient();
+                await purecloudClient.GetAccessToken();
+
                 List<Conversation> result = await purecloudClient.GetConversationsByInterval(processedDate.Date, processedDate.Date);
 
                 // TODO 3. add to "table.conversations"
