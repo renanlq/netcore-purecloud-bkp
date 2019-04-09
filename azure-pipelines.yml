@@ -9,6 +9,10 @@ trigger:
   branches:
     include:
     - master
+    - releases/*
+  paths:
+    exclude:
+    - README.md
 
 pool:
   vmImage: 'Ubuntu-16.04'
