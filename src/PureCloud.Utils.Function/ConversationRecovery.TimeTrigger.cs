@@ -31,8 +31,12 @@ namespace PureCloud.Utils.Function
                 await purecloudClient.GetAccessToken();
 
                 // TODO 3. add to "table.conversations"
-                foreach (var item in await purecloudClient.GetConversationsByInterval(processedDate.Date, processedDate.Date))
-                    await TableStorageService.AddToConversationTableAsync(item);
+                List<Conversation> conversations = await purecloudClient.GetConversationsByInterval(processedDate.Date, processedDate.Date);
+                if (conversations != null)
+                {
+                    foreach (var item in conversations)
+                        await TableStorageService.AddToConversationTableAsync(item);
+                }
             }
 
             // TODO 4. add new date to "table.processeddates"

@@ -97,8 +97,9 @@ namespace PureCloud.Utils.Infra.Service.Client
             int count = 0;
             BatchDownloadJobSubmission queryParam = new BatchDownloadJobSubmission {
                 BatchDownloadRequestList = new List<BatchDownloadRequest>() {
-                new BatchDownloadRequest() { ConversationId = conversationId }
-            }};
+                    new BatchDownloadRequest() { ConversationId = conversationId }
+                }
+            };
 
             BatchDownloadJobSubmissionResult response = new BatchDownloadJobSubmissionResult();
 
