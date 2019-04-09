@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PureCloud.Utils.Domain.Interfaces.Services;
+using PureCloud.Utils.Domain.Models;
 using PureCloudPlatform.Client.V2.Extensions;
 using PureCloudPlatform.Client.V2.Model;
 
@@ -65,7 +66,8 @@ namespace PureCloud.Utils.Infra.Service.Client
                 Order = ConversationQuery.OrderEnum.Asc,
                 OrderBy = ConversationQuery.OrderByEnum.Conversationstart
             };
-            List<Domain.Models.Conversation> response = new List<Domain.Models.Conversation>();
+            Domain.Models.ConversationResponse response = new Domain.Models.ConversationResponse();
+
 
             using (HttpClient hc = new HttpClient())
             {
@@ -78,11 +80,11 @@ namespace PureCloud.Utils.Infra.Service.Client
                 if (responseMessage.StatusCode == HttpStatusCode.OK)
                 {
                     string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
-                    response = JsonConvert.DeserializeObject<List<Domain.Models.Conversation>>(jsonMessage);
+                    response = JsonConvert.DeserializeObject<Domain.Models.ConversationResponse>(jsonMessage);
                 }
             }
 
-            return response;
+            return response.Conversations;
         }
 
         /// <summary>

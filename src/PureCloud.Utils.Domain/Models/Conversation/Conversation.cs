@@ -25,4 +25,10 @@ namespace PureCloud.Utils.Domain.Models
         [JsonProperty("processed")]
         public bool Processed { get; set; }
     }
+
+    public class ConversationResponse
+    {
+        [JsonProperty("conversations")]
+        public List<Conversation> Conversations { get; set; }
+    }
 }
