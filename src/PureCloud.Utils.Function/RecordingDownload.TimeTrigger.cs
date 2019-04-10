@@ -15,10 +15,10 @@ namespace PureCloud.Utils.Function
         [FunctionName("RecordingDownload")]
         [ExceptionFilter(Name = "ConversationRecovery")]
         public async static Task Run(
-            [TimerTrigger("*/1 * * * * *", RunOnStartup = true)]TimerInfo myTimer, 
+            [TimerTrigger("* */1 * * * *", RunOnStartup = true)]TimerInfo myTimer, 
             ILogger log)
         {
-            log.LogInformation($"Started 'RecordingDownload': {DateTime.Now}");
+            log.LogInformation($"{DateTime.Now}: Started 'RecordingDownload'");
 
             // TODO 5. get not processed "table.conversations"
             Conversation conversation = await TableStorageService.GetNoProcessedItemToConversationTableAsync();
@@ -74,7 +74,7 @@ namespace PureCloud.Utils.Function
                     });
             }
 
-            log.LogInformation($"Ended 'RecordingDownload': {DateTime.Now}");
+            log.LogInformation($"{DateTime.Now}: Ended 'RecordingDownload'");
         }
     }
 }
