@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace PureCloud.Utils.Domain.Models
 {
-    public class CallRecording : TableEntity
+    public class Result : TableEntity
     {
         [JsonProperty("jobId")]
         public string JobId { get; set; }

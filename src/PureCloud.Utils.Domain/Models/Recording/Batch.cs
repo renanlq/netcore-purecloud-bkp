@@ -24,6 +24,6 @@ namespace PureCloud.Utils.Domain.Models
         public string ErrorMsg { get; set; }
 
         [JsonProperty("results")]
-        public List<CallRecording> CallRecordings { get; set; }
+        public List<Result> Results { get; set; }
     }
 }

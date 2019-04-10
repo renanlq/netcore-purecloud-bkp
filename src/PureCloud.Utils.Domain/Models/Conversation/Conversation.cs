@@ -19,6 +19,8 @@ namespace PureCloud.Utils.Domain.Models
         [JsonProperty("participants")]
         public List<Participant> Participants { get; set; }
 
+        public string ParticipantsJson { get; set; }
+
         [JsonProperty("divisionIds")]
         public List<string> DivisionIds { get; set; }
 

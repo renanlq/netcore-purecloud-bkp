@@ -1,5 +1,6 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using PureCloud.Utils.Domain.Attribute;
 using PureCloud.Utils.Domain.Models;
 using PureCloud.Utils.Infra.Service.Client;
@@ -15,15 +16,15 @@ namespace PureCloud.Utils.Function
         [FunctionName("ConversationRecovery")]
         [ExceptionFilter(Name = "ConversationRecovery")]
         public async static Task Run(
-            [TimerTrigger("* */1 * * * *", RunOnStartup = true)]TimerInfo myTimer, 
+            [TimerTrigger("*/1 * * * * *", RunOnStartup = true)]TimerInfo myTimer, 
             ILogger log)
         {
-            log.LogInformation($"{DateTime.Now}: Started 'ConversationRecovery'");
+            log.LogInformation($"Started 'ConversationRecovery' function");
 
             // TODO 1. get last processed date on "table.processeddates"
+            DateTime limitDate = DateTime.Now;
             ProcessedDate processedDate = await TableStorageService.GetLastProcessedDateTableAsync();
-            processedDate = processedDate ?? new ProcessedDate() { Date = new DateTime(2016, 06, 08) }; // inicio 2016-06-08
-            DateTime limitDate = new DateTime(2016, 06, 10); //DateTime.Now.Date)
+            processedDate = ProcessedDate.ReturnDateToProcess(processedDate);
 
             if (processedDate.Date < limitDate.Date)
             {
@@ -34,21 +35,28 @@ namespace PureCloud.Utils.Function
                 // TODO 3. add to "table.conversations"
                 List<Conversation> conversations = await purecloudClient.GetConversationsByInterval(
                     processedDate.Date, processedDate.Date);
-                
+
                 if (conversations != null)
                 {
+                    log.LogInformation($"Processing date: {processedDate.Date}, with {conversations.Count} conversations");
+
                     foreach (var item in conversations)
+                    {
+                        // table storage with 1 level information
+                        item.ParticipantsJson = JsonConvert.SerializeObject(item.Participants);
                         await TableStorageService.AddToConversationTableAsync(item);
+                    }
                 }
 
-                // TODO 4. add new date to "table.processeddates"
-                await TableStorageService.AddToProcessedDatesTableAsync(new ProcessedDate()
-                {
-                    Date = processedDate.Date.AddDays(1)
-                });
+                // TODO 4. add processed date to "table.processeddates"
+                await TableStorageService.AddToProcessedDatesTableAsync(processedDate);
+            }
+            else
+            {
+                log.LogInformation($"Pass limit date");
             }
 
-            log.LogInformation($"{DateTime.Now}: Ended 'ConversationRecovery'");
+            log.LogInformation($"Ended 'ConversationRecovery' function");
         }
     }
 }
