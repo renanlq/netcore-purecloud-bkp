@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PureCloud.Utils.Domain.Interfaces.Services;
-using PureCloud.Utils.Domain.Models;
 using PureCloudPlatform.Client.V2.Extensions;
 using PureCloudPlatform.Client.V2.Model;
 
@@ -16,6 +15,8 @@ namespace PureCloud.Utils.Infra.Service.Client
     public class PureCloudClient : IPureCloudService
     {
         private string _token;
+        private const int _pageSize = 100;
+        private int _pageNumber = 1;
         private readonly string _uribase = "https://api.mypurecloud.com";
 
         public PureCloudClient()
@@ -59,12 +60,18 @@ namespace PureCloud.Utils.Infra.Service.Client
         /// <returns>List of purecloud conversations</returns>
         public async Task<List<Domain.Models.Conversation>> GetConversationsByInterval(DateTime begin, DateTime end)
         {
+            List<Domain.Models.Conversation> result = new List<Domain.Models.Conversation>();
+
             ConversationQuery queryParam = new ConversationQuery()
             {
                 //Interval = "2019-01-01T00:00:00.000Z/2019-01-31T23:59:59.999Z",
                 Interval = $"{begin.ToString("yyyy-MM-dd")}T00:00:00.000Z/{end.ToString("yyyy-MM-dd")}T23:59:59.999Z",
                 Order = ConversationQuery.OrderEnum.Asc,
-                OrderBy = ConversationQuery.OrderByEnum.Conversationstart
+                OrderBy = ConversationQuery.OrderByEnum.Conversationstart,
+                Paging = new PagingSpec() {
+                    PageSize = _pageSize,
+                    PageNumber = _pageNumber
+                }
             };
             Domain.Models.ConversationResponse response = new Domain.Models.ConversationResponse();
 
@@ -78,12 +85,21 @@ namespace PureCloud.Utils.Infra.Service.Client
 
                 if (responseMessage.StatusCode == HttpStatusCode.OK)
                 {
-                    string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
-                    response = JsonConvert.DeserializeObject<Domain.Models.ConversationResponse>(jsonMessage);
+                    do // passing trough pagination, due to 100 limited conversations in query response
+                    {
+                        string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
+                        response = JsonConvert.DeserializeObject<Domain.Models.ConversationResponse>(jsonMessage);
+
+                        if (response.Conversations != null)
+                        {
+                            result.AddRange(response.Conversations);
+                            queryParam.Paging.PageNumber++;
+                        }
+                    } while (response.Conversations != null);                   
                 }
             }
 
-            return response.Conversations;
+            return result;
         }
 
         /// <summary>
