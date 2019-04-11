@@ -16,7 +16,7 @@ namespace PureCloud.Utils.Function
         [FunctionName("ConversationRecovery")]
         [ExceptionFilter(Name = "ConversationRecovery")]
         public async static Task Run(
-            [TimerTrigger("*/1 * * * * *", RunOnStartup = true)]TimerInfo myTimer, 
+            [TimerTrigger("* */1 * * * *", RunOnStartup = true)]TimerInfo myTimer, 
             ILogger log)
         {
             log.LogInformation($"Started 'ConversationRecovery' function");

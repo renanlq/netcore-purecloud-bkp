@@ -13,7 +13,7 @@ namespace PureCloud.Utils.Function
         [FunctionName("RecordingDownload")]
         [ExceptionFilter(Name = "ConversationRecovery")]
         public async static Task Run(
-            [TimerTrigger("*/1 * * * * *", RunOnStartup = true)]TimerInfo myTimer, 
+            [TimerTrigger("* */1 * * * *", RunOnStartup = true)]TimerInfo myTimer, 
             ILogger log)
         {
             log.LogInformation($"Started 'RecordingDownload' function");
