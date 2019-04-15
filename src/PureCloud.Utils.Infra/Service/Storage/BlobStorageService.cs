@@ -10,10 +10,11 @@ namespace PureCloud.Utils.Infra.Service.Storage
     public static class BlobStorageService
     {
         private static readonly string _callrecordingBlob = Environment.GetEnvironmentVariable("storage:blob:callrecordings", EnvironmentVariableTarget.Process);
+        private static readonly string _conversationBlob = Environment.GetEnvironmentVariable("storage:blob:conversations", EnvironmentVariableTarget.Process);
 
-        public static async Task UploadBlobAsync(string path, string name, byte[] blob)
+        public static async Task UploadCallRecordingBlobAsync(string path, string name, byte[] blob)
         {
-            var blobContainer = await GetOrCreateContainerAsync();
+            var blobContainer = await GetOrCreateContainerAsync(_callrecordingBlob);
 
             await blobContainer.SetPermissionsAsync(new BlobContainerPermissions
             {
@@ -24,9 +25,9 @@ namespace PureCloud.Utils.Infra.Service.Storage
             await cloudBlockBlob.UploadFromByteArrayAsync(blob, 0, 0);
         }
 
-        public static async Task CopyFromUrlToBlobStorage(string url, string folder, string filename)
+        public static async Task CopyCallRecordingFromUrlToBlobStorage(string url, string folder, string filename)
         {
-            var blobContainer = await GetOrCreateContainerAsync();
+            var blobContainer = await GetOrCreateContainerAsync(_callrecordingBlob);
             var cloudBlockBlob = blobContainer.GetBlockBlobReference($"{folder}/{filename}");
 
             await cloudBlockBlob.StartCopyAsync(new Uri(url));
@@ -48,9 +49,9 @@ namespace PureCloud.Utils.Infra.Service.Storage
             return results;
         }
 
-        private static async Task<CloudBlobContainer> GetOrCreateContainerAsync()
+        private static async Task<CloudBlobContainer> GetOrCreateContainerAsync(string blob)
         {
-            var blobContainer = StorageContext.BlobClient.GetContainerReference(_callrecordingBlob);
+            var blobContainer = StorageContext.BlobClient.GetContainerReference(blob);
             await blobContainer.CreateIfNotExistsAsync();
 
             return blobContainer;

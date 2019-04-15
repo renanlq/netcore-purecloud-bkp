@@ -1,10 +1,12 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using PureCloud.Utils.Domain.Attribute;
 using PureCloud.Utils.Domain.Models;
 using PureCloud.Utils.Infra.Service.Client;
 using PureCloud.Utils.Infra.Service.Storage;
+using PureCloudPlatform.Client.V2.Model;
 
 namespace PureCloud.Utils.Function
 {
@@ -19,7 +21,7 @@ namespace PureCloud.Utils.Function
             log.LogInformation($"Started 'RecordingDownload' function");
 
             // TODO 5. get not processed "table.conversations"
-            Conversation conversation = await TableStorageService.GetNoProcessedItemToConversationTableAsync();
+            Domain.Models.Conversation conversation = await TableStorageService.GetNoProcessedItemToConversationTableAsync();
 
             if (conversation != null)
             {
@@ -30,7 +32,7 @@ namespace PureCloud.Utils.Function
                 // Post batch download conversations
                 string jobId = await purecloudClient.BatchRecordingDownloadByConversation(conversation.ConversationId);
                 // Get url for download by JobId
-                Batch batch = await purecloudClient.GetJobRecordingDownloadResultByConversation(jobId);
+                BatchDownloadJobStatusResult batch = await purecloudClient.GetJobRecordingDownloadResultByConversation(jobId);
 
                 if (batch.Results != null)
                 {
@@ -41,12 +43,18 @@ namespace PureCloud.Utils.Function
 
                         foreach (var item in batch.Results)
                         {
-                            await TableStorageService.AddToCallRecorginsTableAsync(item);
+                            await TableStorageService.AddToCallRecorginsTableAsync(
+                                new CallRecording() {
+                                    JobId = jobId,
+                                    RecordingId = item.RecordingId,
+                                    ConversationId = item.ConversationId,
+                                    CallRecordingJson = JsonConvert.SerializeObject(item)
+                                });
 
                             // TODO 7. download file and upload to "blob.callrecordings"
                             if (!string.IsNullOrEmpty(item.ResultUrl))
                             {
-                                await BlobStorageService.CopyFromUrlToBlobStorage(
+                                await BlobStorageService.CopyCallRecordingFromUrlToBlobStorage(
                                     item.ResultUrl, item.ConversationId, item.RecordingId + ".ogg");
                             }
                         }
@@ -61,10 +69,10 @@ namespace PureCloud.Utils.Function
                             $"{conversation.ConversationId}, in JobId: {jobId}");
 
                         await TableStorageService.AddToCallRecorginsTableAsync(
-                            new Result()
-                            {
+                            new CallRecording() {
+                                JobId = batch.JobId,
                                 ConversationId = batch.Results[0].ConversationId,
-                                JobId = jobId,
+                                CallRecordingJson = JsonConvert.SerializeObject(batch),
                                 ErrorMsg = batch.Results[0].ErrorMsg
                             });
                     }
@@ -74,11 +82,11 @@ namespace PureCloud.Utils.Function
                     log.LogInformation($"Error for conversation: {conversation.ConversationId}, in JobId: {jobId}");
 
                     await TableStorageService.AddToCallRecorginsTableAsync(
-                        new Result()
+                        new CallRecording()
                         {
                             ConversationId = conversation.ConversationId,
                             JobId = jobId,
-                            ErrorMsg = batch.ErrorMsg
+                            ErrorMsg = batch.Results[0].ErrorMsg
                         });
                 }
             }

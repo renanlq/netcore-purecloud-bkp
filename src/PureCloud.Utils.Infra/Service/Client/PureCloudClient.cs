@@ -58,9 +58,9 @@ namespace PureCloud.Utils.Infra.Service.Client
         /// <param name="begin">Datetime, begin date of interval</param>
         /// <param name="end">Datetime, end date of interval</param>
         /// <returns>List of purecloud conversations</returns>
-        public async Task<List<Domain.Models.Conversation>> GetConversationsByInterval(DateTime begin, DateTime end)
+        public async Task<List<AnalyticsConversation>> GetConversationsByInterval(DateTime begin, DateTime end)
         {
-            List<Domain.Models.Conversation> result = new List<Domain.Models.Conversation>();
+            List<AnalyticsConversation> result = new List<AnalyticsConversation>();
 
             ConversationQuery queryParam = new ConversationQuery()
             {
@@ -68,35 +68,35 @@ namespace PureCloud.Utils.Infra.Service.Client
                 Interval = $"{begin.ToString("yyyy-MM-dd")}T00:00:00.000Z/{end.ToString("yyyy-MM-dd")}T23:59:59.999Z",
                 Order = ConversationQuery.OrderEnum.Asc,
                 OrderBy = ConversationQuery.OrderByEnum.Conversationstart,
-                Paging = new PagingSpec() {
+                Paging = new PagingSpec()
+                {
                     PageSize = _pageSize,
                     PageNumber = _pageNumber
                 }
             };
-            Domain.Models.ConversationResponse response = new Domain.Models.ConversationResponse();
+            AnalyticsConversationQueryResponse response = new AnalyticsConversationQueryResponse();
 
             using (HttpClient hc = new HttpClient())
             {
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {_token}");
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-                HttpResponseMessage responseMessage = await hc.PostAsync(_uribase + "/api/v2/analytics/conversations/details/query",
+                do // passing trough pagination, due to 100 limited conversations in query response
+                {
+                    HttpResponseMessage responseMessage = await hc.PostAsync(_uribase + "/api/v2/analytics/conversations/details/query",
                       new StringContent(queryParam.ToJson(), Encoding.UTF8, "application/json"));
 
-                if (responseMessage.StatusCode == HttpStatusCode.OK)
-                {
-                    do // passing trough pagination, due to 100 limited conversations in query response
+                    if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
                         string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
-                        response = JsonConvert.DeserializeObject<Domain.Models.ConversationResponse>(jsonMessage);
+                        response = JsonConvert.DeserializeObject<AnalyticsConversationQueryResponse>(jsonMessage);
 
                         if (response.Conversations != null)
-                        {
                             result.AddRange(response.Conversations);
-                            queryParam.Paging.PageNumber++;
-                        }
-                    } while (response.Conversations != null);                   
-                }
+
+                        queryParam.Paging.PageNumber++;
+                    }
+                } while (response.Conversations != null);
             }
 
             return result;
@@ -111,7 +111,8 @@ namespace PureCloud.Utils.Infra.Service.Client
         public async Task<string> BatchRecordingDownloadByConversation(string conversationId)
         {
             int count = 0;
-            BatchDownloadJobSubmission queryParam = new BatchDownloadJobSubmission {
+            BatchDownloadJobSubmission queryParam = new BatchDownloadJobSubmission
+            {
                 BatchDownloadRequestList = new List<BatchDownloadRequest>() {
                     new BatchDownloadRequest() { ConversationId = conversationId }
                 }
@@ -137,7 +138,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                     }
 
                     count++;
-                } while (responseMessage.StatusCode == HttpStatusCode.Accepted || count < 3 
+                } while (responseMessage.StatusCode == HttpStatusCode.Accepted || count < 3
                     && responseMessage.StatusCode != HttpStatusCode.OK);
             }
 
@@ -150,9 +151,9 @@ namespace PureCloud.Utils.Infra.Service.Client
         /// </summary>
         /// <param name="conversationId">String, conversation id</param>
         /// <returns>Batch response</returns>
-        public async Task<Domain.Models.Batch> GetJobRecordingDownloadResultByConversation(string jobId)
+        public async Task<BatchDownloadJobStatusResult> GetJobRecordingDownloadResultByConversation(string jobId)
         {
-            Domain.Models.Batch response = new Domain.Models.Batch();
+            BatchDownloadJobStatusResult response = new BatchDownloadJobStatusResult();
 
             using (HttpClient hc = new HttpClient())
             {
@@ -168,13 +169,13 @@ namespace PureCloud.Utils.Infra.Service.Client
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
                         string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
-                        response = JsonConvert.DeserializeObject<Domain.Models.Batch>(jsonMessage);
+                        response = JsonConvert.DeserializeObject<BatchDownloadJobStatusResult>(jsonMessage);
                     }
 
                 } while (!response.ExpectedResultCount.Equals(response.ResultCount));
             }
 
-             return response;
+            return response;
         }
     }
 }

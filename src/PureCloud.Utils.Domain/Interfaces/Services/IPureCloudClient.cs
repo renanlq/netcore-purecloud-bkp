@@ -1,4 +1,5 @@
 using PureCloud.Utils.Domain.Models;
+using PureCloudPlatform.Client.V2.Model;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace PureCloud.Utils.Domain.Interfaces.Services
         /// <param name="begin">Datetime, begin date of interval</param>
         /// <param name="end">Datetime, end date of interval</param>
         /// <returns>List of purecloud conversations</returns>
-        Task<List<Conversation>> GetConversationsByInterval(DateTime begin, DateTime end);
+        Task<List<AnalyticsConversation>> GetConversationsByInterval(DateTime begin, DateTime end);
 
         /// <summary>
         /// Batch download recordings.
@@ -32,6 +33,6 @@ namespace PureCloud.Utils.Domain.Interfaces.Services
         /// </summary>
         /// <param name="conversationId">String, conversation id</param>
         /// <returns>Batch response</returns>
-        Task<Domain.Models.Batch> GetJobRecordingDownloadResultByConversation(string jobId);
+        Task<BatchDownloadJobStatusResult> GetJobRecordingDownloadResultByConversation(string jobId);
     }
 }

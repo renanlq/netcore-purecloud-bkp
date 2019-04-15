@@ -3,8 +3,14 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Models\Conversation\**" />
+    <EmbeddedResource Remove="Models\Conversation\**" />
+    <None Remove="Models\Conversation\**" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Host.Storage" Version="3.0.5" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Host.Storage" Version="3.0.6" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
+    <PackageReference Include="PureCloudPlatform.Client.V2" Version="56.0.0" />
   </ItemGroup>
 </Project>

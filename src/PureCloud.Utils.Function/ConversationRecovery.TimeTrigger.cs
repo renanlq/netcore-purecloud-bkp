@@ -5,6 +5,7 @@ using PureCloud.Utils.Domain.Attribute;
 using PureCloud.Utils.Domain.Models;
 using PureCloud.Utils.Infra.Service.Client;
 using PureCloud.Utils.Infra.Service.Storage;
+using PureCloudPlatform.Client.V2.Model;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,13 +17,13 @@ namespace PureCloud.Utils.Function
         [FunctionName("ConversationRecovery")]
         [ExceptionFilter(Name = "ConversationRecovery")]
         public async static Task Run(
-            [TimerTrigger("* */1 * * * *", RunOnStartup = true)]TimerInfo myTimer, 
+            [TimerTrigger("* */1 * * * *", RunOnStartup = true)]TimerInfo myTimer,
             ILogger log)
         {
             log.LogInformation($"Started 'ConversationRecovery' function");
 
             // TODO 1. get last processed date on "table.processeddates"
-            DateTime limitDate = DateTime.Now;
+            DateTime limitDate = (new DateTime(2016, 06, 10));//DateTime.Now;
             ProcessedDate processedDate = await TableStorageService.GetLastProcessedDateTableAsync();
             processedDate = ProcessedDate.ReturnDateToProcess(processedDate);
 
@@ -33,7 +34,7 @@ namespace PureCloud.Utils.Function
                 await purecloudClient.GetAccessToken();
 
                 // TODO 3. add to "table.conversations"
-                List<Conversation> conversations = await purecloudClient.GetConversationsByInterval(
+                List<AnalyticsConversation> conversations = await purecloudClient.GetConversationsByInterval(
                     processedDate.Date, processedDate.Date);
 
                 if (conversations != null)
@@ -42,9 +43,12 @@ namespace PureCloud.Utils.Function
 
                     foreach (var item in conversations)
                     {
-                        // table storage with 1 level information
-                        item.ParticipantsJson = JsonConvert.SerializeObject(item.Participants);
-                        await TableStorageService.AddToConversationTableAsync(item);
+                        Domain.Models.Conversation conversation = new Domain.Models.Conversation() {
+                            ConversationId = item.ConversationId,
+                            ConversationJson = JsonConvert.SerializeObject(item),
+                            Processed = false
+                        };
+                        await TableStorageService.AddToConversationTableAsync(conversation);
                     }
                 }
 
