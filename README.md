@@ -14,6 +14,12 @@ Add utilities to PureCloud using Azure functions.
 ## Solution
 ![Solution architecture](https://github.com/renanlq/purecloud-utils/blob/master/solution-architecture.png)
 
+## Info
+Example of actual PureCloud Recording Audio URL:  
+* https://apps.mypurecloud.com/directory/#/engage/admin/interactions/interactionId  
+We will update to Azure Storage URL:  
+* https://storageaccount.blob.core.windows.net/container/conversationIdBlob
+
 ## Dependencies
 1. [Work with Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 2. [Use the Azure storage emulator for development and testing](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
@@ -37,7 +43,8 @@ $ func start
 ## References
 1. [Azure Functions Documentation](https://docs.microsoft.com/en-us/azure/azure-functions/)
 2. [Create your first function using Visual Studio Code](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-vs-code)
-3. 
+3. [PureCloud Conversation](https://developer.mypurecloud.com/api/rest/v2/conversations/)
+4. [PureCloud Recording](https://developer.mypurecloud.com/api/rest/v2/recording/)
 
 ## Contribution
 If you want to contribute, please read more about markdown tags to edit README file, in [Syntax guidance for Markdown usage](https://docs.microsoft.com/en-us/vsts/project/wiki/markdown-guidance?view=vsts).
