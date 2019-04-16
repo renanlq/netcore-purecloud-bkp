@@ -8,7 +8,7 @@ using PureCloud.Utils.Infra.Service.Client;
 using PureCloud.Utils.Infra.Service.Storage;
 using PureCloudPlatform.Client.V2.Model;
 
-namespace PureCloud.Utils.Function
+namespace PureCloud.Utils.Function.TimeTrigger
 {
     public static class RecordingDownload
     {

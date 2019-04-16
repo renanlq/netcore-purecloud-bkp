@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PureCloud.Utils.Function
+namespace PureCloud.Utils.Function.TimeTrigger
 {
     public static class ConversationRecovery
     {
