@@ -37,7 +37,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
                 List<AnalyticsConversation> conversations = await purecloudClient.GetConversationsByInterval(
                     processedDate.Date, processedDate.Date);
 
-                if (conversations != null)
+                if (!conversations.Count.Equals(0))
                 {
                     log.LogInformation($"Processing date: {processedDate.Date}, with {conversations.Count} conversations");
 

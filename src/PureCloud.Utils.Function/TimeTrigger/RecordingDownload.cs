@@ -32,62 +32,68 @@ namespace PureCloud.Utils.Function.TimeTrigger
                 // Post batch download conversations
                 string jobId = await purecloudClient.BatchRecordingDownloadByConversation(conversation.ConversationId);
                 // Get url for download by JobId
-                BatchDownloadJobStatusResult batch = await purecloudClient.GetJobRecordingDownloadResultByConversation(jobId);
 
-                if (batch.Results != null)
+                if (!string.IsNullOrEmpty(jobId))
                 {
-                    if (batch.ErrorCount.Equals(0))
-                    {
-                        log.LogInformation($"Total callrecordings to download: {batch.Results.Count}, " +
-                            $"for conversation: {conversation.ConversationId}, in JobId: {jobId}");
+                    BatchDownloadJobStatusResult batch = await purecloudClient.GetJobRecordingDownloadResultByConversation(jobId);
 
-                        foreach (var item in batch.Results)
+                    if (!batch.Results.Count.Equals(0))
+                    {
+                        if (batch.ErrorCount.Equals(0))
                         {
-                            await TableStorageService.AddToCallRecorginsTableAsync(
-                                new CallRecording() {
-                                    JobId = jobId,
-                                    RecordingId = item.RecordingId,
-                                    ConversationId = item.ConversationId,
-                                    CallRecordingJson = JsonConvert.SerializeObject(item)
-                                });
+                            log.LogInformation($"Total callrecordings to download: {batch.Results.Count}, " +
+                                $"for conversation: {conversation.ConversationId}, in JobId: {jobId}");
 
-                            // TODO 7. download file and upload to "blob.callrecordings"
-                            if (!string.IsNullOrEmpty(item.ResultUrl))
+                            foreach (var item in batch.Results)
                             {
-                                await BlobStorageService.CopyCallRecordingFromUrlToBlobStorage(
-                                    item.ResultUrl, item.ConversationId, item.RecordingId + ".ogg");
-                            }
-                        }
+                                await TableStorageService.AddToCallRecorginsTableAsync(
+                                    new CallRecording()
+                                    {
+                                        JobId = jobId,
+                                        RecordingId = item.RecordingId,
+                                        ConversationId = item.ConversationId,
+                                        CallRecordingJson = JsonConvert.SerializeObject(item)
+                                    });
 
-                        // TODO 8. update "table.conversations" with uridownload
-                        conversation.Processed = true;
-                        await TableStorageService.UpdateConversationTableAsync(conversation);
+                                // TODO 7. download file and upload to "blob.callrecordings"
+                                if (!string.IsNullOrEmpty(item.ResultUrl))
+                                {
+                                    await BlobStorageService.CopyCallRecordingFromUrlToBlobStorage(
+                                        item.ResultUrl, item.ConversationId, item.RecordingId + ".ogg");
+                                }
+                            }
+
+                            // TODO 8. update "table.conversations" with uridownload
+                            conversation.Processed = true;
+                            await TableStorageService.UpdateConversationTableAsync(conversation);
+                        }
+                        else if (batch.Results.Count.Equals(1))
+                        {
+                            log.LogInformation($"No callrecordings to download for conversation: " +
+                                $"{conversation.ConversationId}, in JobId: {jobId}");
+
+                            await TableStorageService.AddToCallRecorginsTableAsync(
+                                new CallRecording()
+                                {
+                                    JobId = batch.JobId,
+                                    ConversationId = batch.Results[0].ConversationId,
+                                    CallRecordingJson = JsonConvert.SerializeObject(batch),
+                                    ErrorMsg = batch.Results[0].ErrorMsg
+                                });
+                        }
                     }
-                    else if (batch.Results.Count.Equals(1))
+                    else
                     {
-                        log.LogInformation($"No callrecordings to download for conversation: " +
-                            $"{conversation.ConversationId}, in JobId: {jobId}");
+                        log.LogInformation($"Error for conversation: {conversation.ConversationId}, in JobId: {jobId}");
 
                         await TableStorageService.AddToCallRecorginsTableAsync(
-                            new CallRecording() {
-                                JobId = batch.JobId,
-                                ConversationId = batch.Results[0].ConversationId,
-                                CallRecordingJson = JsonConvert.SerializeObject(batch),
+                            new CallRecording()
+                            {
+                                ConversationId = conversation.ConversationId,
+                                JobId = jobId,
                                 ErrorMsg = batch.Results[0].ErrorMsg
                             });
                     }
-                }
-                else
-                {
-                    log.LogInformation($"Error for conversation: {conversation.ConversationId}, in JobId: {jobId}");
-
-                    await TableStorageService.AddToCallRecorginsTableAsync(
-                        new CallRecording()
-                        {
-                            ConversationId = conversation.ConversationId,
-                            JobId = jobId,
-                            ErrorMsg = batch.Results[0].ErrorMsg
-                        });
                 }
             }
             else
