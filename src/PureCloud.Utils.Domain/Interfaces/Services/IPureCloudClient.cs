@@ -1,4 +1,3 @@
-using PureCloud.Utils.Domain.Models;
 using PureCloudPlatform.Client.V2.Model;
 using System;
 using System.Collections.Generic;
