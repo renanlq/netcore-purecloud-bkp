@@ -16,7 +16,7 @@ namespace PureCloud.Utils.Domain.Interfaces.Services
         /// </summary>
         /// <param name="begin">Datetime, begin date of interval</param>
         /// <param name="end">Datetime, end date of interval</param>
-        /// <returns>List of purecloud conversations</returns>
+        /// <returns>List<AnalyticsConversation>, list of purecloud conversations</returns>
         Task<List<AnalyticsConversation>> GetConversationsByInterval(DateTime begin, DateTime end);
 
         /// <summary>
@@ -32,7 +32,14 @@ namespace PureCloud.Utils.Domain.Interfaces.Services
         /// Link: https://developer.mypurecloud.com/api/rest/v2/recording/#get-api-v2-recording-batchrequests--jobId-
         /// </summary>
         /// <param name="conversationId">String, conversation id</param>
-        /// <returns>Batch response</returns>
+        /// <returns>BatchDownloadJobStatusResult, object of bach request</returns>
         Task<BatchDownloadJobStatusResult> GetJobRecordingDownloadResultByConversation(string jobId);
+
+        /// <summary>
+        /// Get availabe users from PureCloud
+        /// </summary>
+        /// <returns>List<Users>, list of object user</returns>
+        Task<List<User>> GetAvailableUsers();
+
     }
 }
