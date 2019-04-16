@@ -17,14 +17,14 @@ namespace PureCloud.Utils.Function.TimeTrigger
         [FunctionName("ConversationRecovery")]
         [ExceptionFilter(Name = "ConversationRecovery")]
         public async static Task Run(
-            [TimerTrigger("* */1 * * * *", RunOnStartup = true)]TimerInfo myTimer,
+            [TimerTrigger("* */1 * * * *", RunOnStartup = false)]TimerInfo myTimer,
             ILogger log)
         {
             log.LogInformation($"Started 'ConversationRecovery' function");
 
             // TODO 1. get last processed date on "table.processeddates"
             DateTime limitDate = (new DateTime(2016, 06, 10));//DateTime.Now;
-            ProcessedDate processedDate = await TableStorageService.GetLastProcessedDateTableAsync();
+            ProcessedDate processedDate = await TableStorageService.GetLastProcessedDateAsync();
             processedDate = ProcessedDate.ReturnDateToProcess(processedDate);
 
             if (processedDate.Date < limitDate.Date)
@@ -48,12 +48,12 @@ namespace PureCloud.Utils.Function.TimeTrigger
                             ConversationJson = JsonConvert.SerializeObject(item),
                             Processed = false
                         };
-                        await TableStorageService.AddToConversationTableAsync(conversation);
+                        await TableStorageService.AddToConversationAsync(conversation);
                     }
                 }
 
                 // TODO 4. add processed date to "table.processeddates"
-                await TableStorageService.AddToProcessedDatesTableAsync(processedDate);
+                await TableStorageService.AddToProcessedDatesAsync(processedDate);
             }
             else
             {

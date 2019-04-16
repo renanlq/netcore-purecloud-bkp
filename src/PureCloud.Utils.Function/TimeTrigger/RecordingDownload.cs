@@ -15,13 +15,13 @@ namespace PureCloud.Utils.Function.TimeTrigger
         [FunctionName("RecordingDownload")]
         [ExceptionFilter(Name = "ConversationRecovery")]
         public async static Task Run(
-            [TimerTrigger("* */1 * * * *", RunOnStartup = true)]TimerInfo myTimer, 
+            [TimerTrigger("* */1 * * * *", RunOnStartup = false)]TimerInfo myTimer, 
             ILogger log)
         {
             log.LogInformation($"Started 'RecordingDownload' function");
 
             // TODO 5. get not processed "table.conversations"
-            Domain.Models.Conversation conversation = await TableStorageService.GetNoProcessedItemToConversationTableAsync();
+            Domain.Models.Conversation conversation = await TableStorageService.GetNotProcessedConversationAsync();
 
             if (conversation != null)
             {
@@ -46,7 +46,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
 
                             foreach (var item in batch.Results)
                             {
-                                await TableStorageService.AddToCallRecorginsTableAsync(
+                                await TableStorageService.AddToCallRecorginsAsync(
                                     new CallRecording()
                                     {
                                         JobId = jobId,
@@ -72,7 +72,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
                             log.LogInformation($"No callrecordings to download for conversation: " +
                                 $"{conversation.ConversationId}, in JobId: {jobId}");
 
-                            await TableStorageService.AddToCallRecorginsTableAsync(
+                            await TableStorageService.AddToCallRecorginsAsync(
                                 new CallRecording()
                                 {
                                     JobId = batch.JobId,
@@ -86,7 +86,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
                     {
                         log.LogInformation($"Error for conversation: {conversation.ConversationId}, in JobId: {jobId}");
 
-                        await TableStorageService.AddToCallRecorginsTableAsync(
+                        await TableStorageService.AddToCallRecorginsAsync(
                             new CallRecording()
                             {
                                 ConversationId = conversation.ConversationId,
