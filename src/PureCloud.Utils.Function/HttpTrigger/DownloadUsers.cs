@@ -1,15 +1,16 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using PureCloud.Utils;
 using PureCloud.Utils.Infra.Service.Client;
-using System.Collections.Generic;
+using PureCloud.Utils.Infra.Service.Storage;
 using PureCloudPlatform.Client.V2.Model;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace HttpTrigger
 {
@@ -17,27 +18,56 @@ namespace HttpTrigger
     {
         [FunctionName("DownloadUsers")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "v1/users")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "v1/users")] HttpRequest req,
             ILogger log)
         {
             log.LogInformation($"Started 'DownloadUsers' function");
+            string key = await checkKey(req);
+
+            if (key == null)
+                return new BadRequestObjectResult("Please pass a name on the query string or in the request body");
 
             PureCloudClient purecloudClient = new PureCloudClient();
             await purecloudClient.GetAccessToken();
 
             List<User> users = await purecloudClient.GetAvailableUsers();
 
-            string name = req.Query["name"];
+            if (!users.Count.Equals(0))
+            {
+                foreach (var user in users)
+                {
+                    var tableUser = await TableStorageService.GetUserAsync(user.Id);
+                    if (tableUser == null)
+                    {
+                        await TableStorageService.AddToUserAsync(new PureCloud.Utils.Domain.Models.User()
+                        {
+                            Id = user.Id,
+                            Name = user.Name,
+                            Email = user.Email,
+                            Username = user.Username,
+                            Departament = user.Department,
+                            Title = user.Title,
+                            ManagerId = user.Manager == null ? "" : user.Manager.Id,
+                            ManagerName = user.Manager == null ? "" : user.Manager.Name,
+                            Chat = user.Chat == null ? "" : user.Chat.JabberId,
+                            DivisionId = user.Division == null ? "" : user.Division.Id,
+                            DivisionName = user.Division == null ? "" : user.Division.Name
+                        });
+                    }
+                }
+            }
 
+            log.LogInformation($"Ended 'DownloadUsers' function");
+            return (ActionResult)new OkResult();
+        }
+
+        private static async Task<string> checkKey(HttpRequest req)
+        {
+            string key = req.Query["key"];
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
-
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
-
-            //log.LogInformation($"Ended 'DownloadUsers' function");
+            key = key ?? data?.key;
+            return key;
         }
     }
 }

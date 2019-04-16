@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PureCloud.Utils.Domain.Interfaces.Services;
-using PureCloud.Utils.Domain.Models;
 using PureCloudPlatform.Client.V2.Extensions;
 using PureCloudPlatform.Client.V2.Model;
 
@@ -94,12 +93,16 @@ namespace PureCloud.Utils.Infra.Service.Client
                         response = JsonConvert.DeserializeObject<AnalyticsConversationQueryResponse>(jsonMessage);
 
                         if (response.Conversations != null)
+                        {
                             result.AddRange(response.Conversations);
+                        }
 
                         queryParam.Paging.PageNumber++;
                     }
                     else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
+                    {
                         return new List<AnalyticsConversation>();
+                    }
 
                 } while (response.Conversations != null);
             }
@@ -148,7 +151,9 @@ namespace PureCloud.Utils.Infra.Service.Client
                         return result;
                     }
                     else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
+                    {
                         return string.Empty;
+                    }
 
                     count++;
                 } while (responseMessage.StatusCode == HttpStatusCode.Accepted && responseMessage.StatusCode != HttpStatusCode.OK);
@@ -186,7 +191,9 @@ namespace PureCloud.Utils.Infra.Service.Client
                         result = JsonConvert.DeserializeObject<BatchDownloadJobStatusResult>(jsonMessage);
                     }
                     else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
+                    {
                         return new BatchDownloadJobStatusResult();
+                    }
 
                 } while (!response.ExpectedResultCount.Equals(response.ResultCount));
             }
@@ -208,8 +215,9 @@ namespace PureCloud.Utils.Infra.Service.Client
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                 UserEntityListing response = new UserEntityListing();
+                _pageNumber = 1;
 
-                do // passing trough pagination, due to 100 limited conversations in query response
+                do // passing trough pagination, due to 500 limited users from response
                 {
                     HttpResponseMessage responseMessage = await hc.GetAsync(_uribase +
                         $"/api/v2/users?pageSize={_pageUserSize}&pageNumber={_pageNumber}");
@@ -219,15 +227,18 @@ namespace PureCloud.Utils.Infra.Service.Client
                     {
                         response = JsonConvert.DeserializeObject<UserEntityListing>(jsonMessage);
 
-                        if (response.Entities != null)
+                        if (!response.Entities.Count.Equals(0))
+                        {
                             result.AddRange(response.Entities);
+                        }
 
                         _pageNumber++;
                     }
                     else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
+                    {
                         return new List<User>();
-
-                } while (response.Entities.Count.Equals(0));
+                    }
+                } while (!response.Entities.Count.Equals(0));
             }
 
             return result;
