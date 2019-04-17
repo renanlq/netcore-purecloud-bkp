@@ -9,45 +9,49 @@ namespace PureCloud.Utils.Infra.Service.Storage
 {
     public static class BlobStorageService
     {
-        private static readonly string _callrecordingBlob = Environment.GetEnvironmentVariable("storage:blob:callrecordings", EnvironmentVariableTarget.Process);
-        private static readonly string _conversationBlob = Environment.GetEnvironmentVariable("storage:blob:conversations", EnvironmentVariableTarget.Process);
-        private static readonly string _errorLogBlob = Environment.GetEnvironmentVariable("storage:blob:errorlogs", EnvironmentVariableTarget.Process);
+        private static readonly string _callrecordingsBlob = Environment.GetEnvironmentVariable("storage:blob:callrecordings", EnvironmentVariableTarget.Process);
+        private static readonly string _conversationsBlob = Environment.GetEnvironmentVariable("storage:blob:conversations", EnvironmentVariableTarget.Process);
+        private static readonly string _errorLogsBlob = Environment.GetEnvironmentVariable("storage:blob:errorlogs", EnvironmentVariableTarget.Process);
+        private static readonly string _usersBlob = Environment.GetEnvironmentVariable("storage:blob:users", EnvironmentVariableTarget.Process);
 
-        public static async Task UploadCallRecordingBlobAsync(string path, string name, byte[] blob)
+        public static async Task AddCallRecordingAsync(string callrecording, string folder, string name)
         {
-            var blobContainer = await GetOrCreateContainerAsync(_callrecordingBlob);
+            var blobContainer = await GetOrCreateContainerAsync(_callrecordingsBlob);
+            var cloudBlockBlob = blobContainer.GetBlockBlobReference($"{folder}/{name}");
 
-            await blobContainer.SetPermissionsAsync(new BlobContainerPermissions
-            {
-                PublicAccess = BlobContainerPublicAccessType.Blob
-            });
-            var cloudBlockBlob = blobContainer.GetBlockBlobReference($"{path}/{name}");
-
-            await cloudBlockBlob.UploadFromByteArrayAsync(blob, 0, 0);
+            await cloudBlockBlob.UploadTextAsync(callrecording);
         }
 
-        public static async Task CopyCallRecordingFromUrlToBlobStorage(string url, string folder, string filename)
+        public static async Task AddCallRecordingAudioFromUrlAsync(string url, string folder, string name)
         {
-            var blobContainer = await GetOrCreateContainerAsync(_callrecordingBlob);
-            var cloudBlockBlob = blobContainer.GetBlockBlobReference($"{folder}/{filename}");
+            var blobContainer = await GetOrCreateContainerAsync(_callrecordingsBlob);
+            var cloudBlockBlob = blobContainer.GetBlockBlobReference($"{folder}/{name}");
 
             await cloudBlockBlob.StartCopyAsync(new Uri(url));
         }
 
-        private static async Task<List<IListBlobItem>> ListBlobAsync(CloudBlobContainer blobContainer)
+        public static async Task AddConversationFromTextAsync(string conversation, string name)
         {
-            BlobContinuationToken continuationToken = null;
-            List<IListBlobItem> results = new List<IListBlobItem>();
+            var blobContainer = await GetOrCreateContainerAsync(_conversationsBlob);
+            var cloudBlockBlob = blobContainer.GetBlockBlobReference($"{name}");
 
-            do
-            {
-                var response = await blobContainer.ListBlobsSegmentedAsync(continuationToken);
-                continuationToken = response.ContinuationToken;
-                results.AddRange(response.Results);
+            await cloudBlockBlob.UploadTextAsync(conversation);
+        }
 
-            } while (continuationToken != null);
+        public static async Task AddErrorFromTextAsync(string error, string name)
+        {
+            var blobContainer = await GetOrCreateContainerAsync(_errorLogsBlob);
+            var cloudBlockBlob = blobContainer.GetBlockBlobReference($"{name}");
 
-            return results;
+            await cloudBlockBlob.UploadTextAsync(error);
+        }
+
+        public static async Task AddUserFromTextAsync(string user, string name)
+        {
+            var blobContainer = await GetOrCreateContainerAsync(_usersBlob);
+            var cloudBlockBlob = blobContainer.GetBlockBlobReference($"{name}");
+
+            await cloudBlockBlob.UploadTextAsync(user);
         }
 
         private static async Task<CloudBlobContainer> GetOrCreateContainerAsync(string blob)

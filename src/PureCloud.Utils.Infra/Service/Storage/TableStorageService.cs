@@ -15,7 +15,7 @@ namespace PureCloud.Utils.Infra.Service.Storage
         private static readonly string _processedDatesTable = Environment.GetEnvironmentVariable("storage:table:processeddates", EnvironmentVariableTarget.Process);
         private static readonly string _usersTable = Environment.GetEnvironmentVariable("storage:table:users", EnvironmentVariableTarget.Process);
 
-        public static async Task AddToCallRecorginsAsync(CallRecording content)
+        public static async Task AddToCallRecorgindAsync(CallRecording content)
         {
             var table = await GetOrCreateTableAsync(_callrecordingsTable);
             await AddToTableAsync<CallRecording>(content, table);
