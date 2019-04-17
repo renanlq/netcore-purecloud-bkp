@@ -38,10 +38,10 @@ namespace PureCloud.Utils.Infra.Service.Storage
             await cloudBlockBlob.UploadTextAsync(conversation);
         }
 
-        public static async Task AddErrorFromTextAsync(string error, string name)
+        public static async Task AddErrorFromTextAsync(string error, string folder, string name)
         {
             var blobContainer = await GetOrCreateContainerAsync(_errorLogsBlob);
-            var cloudBlockBlob = blobContainer.GetBlockBlobReference($"{name}");
+            var cloudBlockBlob = blobContainer.GetBlockBlobReference($"{folder}/{name}");
 
             await cloudBlockBlob.UploadTextAsync(error);
         }

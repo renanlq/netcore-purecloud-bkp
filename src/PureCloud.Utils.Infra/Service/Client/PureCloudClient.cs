@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PureCloud.Utils.Domain.Interfaces.Services;
+using PureCloud.Utils.Infra.Service.Storage;
 using PureCloudPlatform.Client.V2.Extensions;
 using PureCloudPlatform.Client.V2.Model;
 
@@ -46,6 +47,10 @@ namespace PureCloud.Utils.Infra.Service.Client
                 {
                     string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
                     access_tokenInfo = JsonConvert.DeserializeObject<AuthTokenInfo>(jsonMessage);
+                }
+                else {
+                    await BlobStorageService.AddErrorFromTextAsync(
+                        JsonConvert.SerializeObject(responseMessage), "getaccesstoken", $"{DateTime.Now}.json");
                 }
             }
 
@@ -101,6 +106,8 @@ namespace PureCloud.Utils.Infra.Service.Client
                     }
                     else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
                     {
+                        await BlobStorageService.AddErrorFromTextAsync(
+                                JsonConvert.SerializeObject(responseMessage), "getconversationsnyinterval", $"{begin.Date}.json");
                         return new List<AnalyticsConversation>();
                     }
 
@@ -145,6 +152,12 @@ namespace PureCloud.Utils.Infra.Service.Client
                         result = JsonConvert.DeserializeObject<BatchDownloadJobSubmissionResult>(jsonMessage);
                         if (count.Equals(3)) return result;
                     }
+                    else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
+                    {
+                        await BlobStorageService.AddErrorFromTextAsync(
+                                JsonConvert.SerializeObject(responseMessage), "batchrecordingdownloadbyconversation", $"{conversationId}.json");
+                        return result;
+                    }
 
                     count++;
                 } while (responseMessage.StatusCode == HttpStatusCode.Accepted && responseMessage.StatusCode != HttpStatusCode.OK);
@@ -181,7 +194,9 @@ namespace PureCloud.Utils.Infra.Service.Client
                     }
                     else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
                     {
-                        return new BatchDownloadJobStatusResult();
+                        await BlobStorageService.AddErrorFromTextAsync(
+                            JsonConvert.SerializeObject(responseMessage), "batchrecordingdownloadbyconversation", $"{jobId}.json");
+                        return result;
                     }
 
                 } while (!result.ExpectedResultCount.Equals(result.ResultCount));
@@ -223,10 +238,14 @@ namespace PureCloud.Utils.Infra.Service.Client
 
                         _pageNumber++;
                     }
+
                     else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
                     {
-                        return new List<User>();
+                        await BlobStorageService.AddErrorFromTextAsync(
+                            JsonConvert.SerializeObject(responseMessage), "getavailableusers", $"{DateTime.Now}.json");
+                        return result;
                     }
+
                 } while (!response.Entities.Count.Equals(0));
             }
 

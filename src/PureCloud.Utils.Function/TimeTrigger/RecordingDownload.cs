@@ -35,10 +35,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
 
                     // Get url for download by JobId
                     BatchDownloadJobStatusResult batch = await purecloudClient.GetJobRecordingDownloadResultByConversation(jobId);
-
                     log.LogInformation($"Bach with Job id: {jobId}, for callrecordings in conversation: {conversation.ConversationId}");
-                    await BlobStorageService.AddCallRecordingAsync(
-                        JsonConvert.SerializeObject(batch), "batchs", $"{conversation.ConversationId}.json");
 
                     if (!batch.Results.Count.Equals(0))
                     {
@@ -63,15 +60,15 @@ namespace PureCloud.Utils.Function.TimeTrigger
                         else if (batch.Results.Count.Equals(1))
                         {
                             log.LogInformation($"No callrecordings for conversation: {conversation.ConversationId}, in JobId: {jobId}");
-                            await BlobStorageService.AddErrorFromTextAsync(
-                                JsonConvert.SerializeObject(batch), $"{conversation.ConversationId}.json");
+                            await BlobStorageService.AddCallRecordingAsync(
+                                JsonConvert.SerializeObject(batch), conversation.ConversationId, $"{conversation.ConversationId}.json");
                         }
                     }
                     else
                     {
                         log.LogInformation($"No results for conversation: {conversation.ConversationId}, in JobId: {jobId}");
-                        await BlobStorageService.AddErrorFromTextAsync(
-                            JsonConvert.SerializeObject(batch), $"{conversation.ConversationId}.json");
+                        await BlobStorageService.AddCallRecordingAsync(
+                            JsonConvert.SerializeObject(batch), conversation.ConversationId, $"{conversation.ConversationId}.json");
                     }
 
                     // TODO 8. update "table.conversations" with uridownload
