@@ -11,9 +11,6 @@ namespace PureCloud.Utils.Domain.Models
         [JsonProperty("conversationId")]
         public string ConversationId { get; set; }
 
-        [JsonProperty("conversationJson")]
-        public string ConversationJson { get; set; }
-
         [JsonProperty("processed")]
         public bool Processed { get; set; }
     }

@@ -23,7 +23,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
             log.LogInformation($"Started 'ConversationRecovery' function");
 
             // TODO 1. get last processed date on "table.processeddates"
-            DateTime limitDate = (new DateTime(2016, 06, 10));//DateTime.Now;
+            DateTime limitDate = (new DateTime(2016, 07, 1)); //DateTime.Now;
             ProcessedDate processedDate = await TableStorageService.GetLastProcessedDateAsync();
             processedDate = ProcessedDate.ReturnDateToProcess(processedDate);
 
@@ -37,18 +37,19 @@ namespace PureCloud.Utils.Function.TimeTrigger
                 List<AnalyticsConversation> conversations = await purecloudClient.GetConversationsByInterval(
                     processedDate.Date, processedDate.Date);
 
+                log.LogInformation($"Processing date: {processedDate.Date}, with {conversations.Count} conversations");
+
                 if (!conversations.Count.Equals(0))
                 {
-                    log.LogInformation($"Processing date: {processedDate.Date}, with {conversations.Count} conversations");
-
                     foreach (var item in conversations)
                     {
-                        Domain.Models.Conversation conversation = new Domain.Models.Conversation() {
-                            ConversationId = item.ConversationId,
-                            ConversationJson = JsonConvert.SerializeObject(item),
-                            Processed = false
-                        };
-                        await TableStorageService.AddToConversationAsync(conversation);
+                        await TableStorageService.AddToConversationAsync(
+                            new Domain.Models.Conversation() {
+                                ConversationId = item.ConversationId,
+                                Processed = false
+                            });
+                        await BlobStorageService.AddConversationFromTextAsync(
+                            JsonConvert.SerializeObject(item), $"{item.ConversationId}.json");
                     }
                 }
 

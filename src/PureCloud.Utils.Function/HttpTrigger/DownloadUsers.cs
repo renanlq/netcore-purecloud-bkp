@@ -8,7 +8,6 @@ using PureCloud.Utils.Infra.Service.Client;
 using PureCloud.Utils.Infra.Service.Storage;
 using PureCloudPlatform.Client.V2.Model;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace HttpTrigger
@@ -29,25 +28,20 @@ namespace HttpTrigger
 
             if (!users.Count.Equals(0))
             {
+                log.LogInformation($"Total users to sabe: {users.Count}");
+
                 foreach (var user in users)
                 {
                     var tableUser = await TableStorageService.GetUserAsync(user.Id);
                     if (tableUser == null)
                     {
-                        await TableStorageService.AddToUserAsync(new PureCloud.Utils.Domain.Models.User()
-                        {
-                            Id = user.Id,
-                            Name = user.Name,
-                            Email = user.Email,
-                            Username = user.Username,
-                            Departament = user.Department,
-                            Title = user.Title,
-                            ManagerId = user.Manager == null ? "" : user.Manager.Id,
-                            ManagerName = user.Manager == null ? "" : user.Manager.Name,
-                            Chat = user.Chat == null ? "" : user.Chat.JabberId,
-                            DivisionId = user.Division == null ? "" : user.Division.Id,
-                            DivisionName = user.Division == null ? "" : user.Division.Name
-                        });
+                        await TableStorageService.AddToUserAsync(
+                            new PureCloud.Utils.Domain.Models.User() {
+                                Id = user.Id,
+                                Email = user.Email
+                            });
+                        await BlobStorageService.AddUserFromTextAsync(
+                            JsonConvert.SerializeObject(user), $"{user.Id}.json");
                     }
                 }
             }

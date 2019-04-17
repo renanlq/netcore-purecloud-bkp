@@ -15,7 +15,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
         [FunctionName("RecordingDownload")]
         [ExceptionFilter(Name = "ConversationRecovery")]
         public async static Task Run(
-            [TimerTrigger("* */1 * * * *", RunOnStartup = false)]TimerInfo myTimer, 
+            [TimerTrigger("* */1 * * * *", RunOnStartup = false)]TimerInfo myTimer,
             ILogger log)
         {
             log.LogInformation($"Started 'RecordingDownload' function");
@@ -37,65 +37,44 @@ namespace PureCloud.Utils.Function.TimeTrigger
                 {
                     BatchDownloadJobStatusResult batch = await purecloudClient.GetJobRecordingDownloadResultByConversation(jobId);
 
-                    if (batch.Results != null)
+                    if (!batch.Results.Count.Equals(0))
                     {
-                        if (!batch.Results.Count.Equals(0))
+                        if (batch.ErrorCount.Equals(0))
                         {
-                            if (batch.ErrorCount.Equals(0))
+                            log.LogInformation($"Total callrecordings to download: {batch.Results.Count}, " +
+                                $"for conversation: {conversation.ConversationId}, in JobId: {jobId}");
+
+                            await BlobStorageService.AddCallRecordingAsync(
+                                JsonConvert.SerializeObject(batch), "batch", $"{batch.Id}.json");
+
+                            foreach (var item in batch.Results)
                             {
-                                log.LogInformation($"Total callrecordings to download: {batch.Results.Count}, " +
-                                    $"for conversation: {conversation.ConversationId}, in JobId: {jobId}");
+                                await BlobStorageService.AddCallRecordingAsync(
+                                    JsonConvert.SerializeObject(item), item.ConversationId, $"{item.RecordingId}.json");
 
-                                foreach (var item in batch.Results)
+                                // TODO 7. download file and upload to "blob.callrecordings"
+                                if (!string.IsNullOrEmpty(item.ResultUrl))
                                 {
-                                    await TableStorageService.AddToCallRecorginsAsync(
-                                        new CallRecording()
-                                        {
-                                            JobId = jobId,
-                                            RecordingId = item.RecordingId,
-                                            ConversationId = item.ConversationId,
-                                            CallRecordingJson = JsonConvert.SerializeObject(item)
-                                        });
-
-                                    // TODO 7. download file and upload to "blob.callrecordings"
-                                    if (!string.IsNullOrEmpty(item.ResultUrl))
-                                    {
-                                        await BlobStorageService.CopyCallRecordingFromUrlToBlobStorage(
-                                            item.ResultUrl, item.ConversationId, item.RecordingId + ".ogg");
-                                    }
+                                    await BlobStorageService.AddCallRecordingAudioFromUrlAsync(
+                                        item.ResultUrl, item.ConversationId, $"{item.RecordingId}.ogg");
                                 }
-
-                                // TODO 8. update "table.conversations" with uridownload
-                                conversation.Processed = true;
-                                await TableStorageService.UpdateConversationTableAsync(conversation);
                             }
-                            else if (batch.Results.Count.Equals(1))
-                            {
-                                log.LogInformation($"No callrecordings to download for conversation: " +
-                                    $"{conversation.ConversationId}, in JobId: {jobId}");
 
-                                await TableStorageService.AddToCallRecorginsAsync(
-                                    new CallRecording()
-                                    {
-                                        JobId = batch.JobId,
-                                        ConversationId = batch.Results[0].ConversationId,
-                                        CallRecordingJson = JsonConvert.SerializeObject(batch),
-                                        ErrorMsg = batch.Results[0].ErrorMsg
-                                    });
-                            }
+                            // TODO 8. update "table.conversations" with uridownload
+                            conversation.Processed = true;
+                            await TableStorageService.UpdateConversationTableAsync(conversation);
                         }
-                        else
+                        else if (batch.Results.Count.Equals(1))
                         {
-                            log.LogInformation($"Error for conversation: {conversation.ConversationId}, in JobId: {jobId}");
-
-                            await TableStorageService.AddToCallRecorginsAsync(
-                                new CallRecording()
-                                {
-                                    ConversationId = conversation.ConversationId,
-                                    JobId = jobId,
-                                    ErrorMsg = batch.Results[0].ErrorMsg
-                                });
+                            log.LogInformation($"No callrecordings to download for conversation: " + 
+                                $"{conversation.ConversationId}, in JobId: {jobId}");
+                            await BlobStorageService.AddErrorFromTextAsync(JsonConvert.SerializeObject(batch), batch.JobId);
                         }
+                    }
+                    else
+                    {
+                        log.LogInformation($"Error for conversation: {conversation.ConversationId}, in JobId: {jobId}");
+                        await BlobStorageService.AddErrorFromTextAsync(JsonConvert.SerializeObject(batch), batch.JobId);
                     }
                 }
             }
