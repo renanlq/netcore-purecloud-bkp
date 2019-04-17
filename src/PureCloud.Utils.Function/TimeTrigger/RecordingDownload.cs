@@ -31,13 +31,13 @@ namespace PureCloud.Utils.Function.TimeTrigger
                 // Post batch download conversations
                 BatchDownloadJobSubmissionResult job = await purecloudClient.BatchRecordingDownloadByConversation(conversation.ConversationId);
 
-                if (job != null && !string.IsNullOrEmpty(job.Id))
+                if (!string.IsNullOrEmpty(job.Id))
                 {
                     string jobId = job.Id;
 
                     // Get url for download by JobId
                     BatchDownloadJobStatusResult batch = await purecloudClient.GetJobRecordingDownloadResultByConversation(jobId);
-                    log.LogInformation($"Bach: {batch.Id}, for conversation: {conversation.ConversationId}, in JobId: {jobId}");
+                    log.LogInformation($"Bach with Job id: {jobId}, for callrecordings in conversation: {conversation.ConversationId}");
 
                     if (!batch.Results.Count.Equals(0))
                     {

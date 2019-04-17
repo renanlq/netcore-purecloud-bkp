@@ -143,10 +143,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
                         result = JsonConvert.DeserializeObject<BatchDownloadJobSubmissionResult>(jsonMessage);
-                    }
-                    else if (count.Equals(3) || (int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
-                    {
-                        return result;
+                        if (count.Equals(3)) return result;
                     }
 
                     count++;
