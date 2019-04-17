@@ -4,7 +4,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using PureCloud.Utils;
 using PureCloud.Utils.Infra.Service.Client;
 using PureCloud.Utils.Infra.Service.Storage;
 using PureCloudPlatform.Client.V2.Model;
@@ -22,10 +21,6 @@ namespace HttpTrigger
             ILogger log)
         {
             log.LogInformation($"Started 'DownloadUsers' function");
-            string key = await checkKey(req);
-
-            if (key == null)
-                return new BadRequestObjectResult("Please pass a name on the query string or in the request body");
 
             PureCloudClient purecloudClient = new PureCloudClient();
             await purecloudClient.GetAccessToken();
@@ -59,15 +54,6 @@ namespace HttpTrigger
 
             log.LogInformation($"Ended 'DownloadUsers' function");
             return (ActionResult)new OkResult();
-        }
-
-        private static async Task<string> checkKey(HttpRequest req)
-        {
-            string key = req.Query["key"];
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            key = key ?? data?.key;
-            return key;
         }
     }
 }
