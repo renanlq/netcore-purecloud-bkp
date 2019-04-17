@@ -20,10 +20,8 @@ namespace PureCloud.Utils.Function.TimeTrigger
             [TimerTrigger("* */1 * * * *", RunOnStartup = false)]TimerInfo myTimer,
             ILogger log)
         {
-            log.LogInformation($"Started 'ConversationRecovery' function");
-
             // TODO 1. get last processed date on "table.processeddates"
-            DateTime limitDate = (new DateTime(2016, 06, 11)); //DateTime.Now;
+            DateTime limitDate = DateTime.Now;
             ProcessedDate processedDate = await TableStorageService.GetLastProcessedDateAsync();
             processedDate = ProcessedDate.ReturnDateToProcess(processedDate);
 
@@ -60,8 +58,6 @@ namespace PureCloud.Utils.Function.TimeTrigger
             {
                 log.LogInformation($"Pass limit date");
             }
-
-            log.LogInformation($"Ended 'ConversationRecovery' function");
         }
     }
 }

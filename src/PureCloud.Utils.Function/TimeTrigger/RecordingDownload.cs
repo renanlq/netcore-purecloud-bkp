@@ -14,11 +14,9 @@ namespace PureCloud.Utils.Function.TimeTrigger
         [FunctionName("RecordingDownload")]
         [ExceptionFilter(Name = "ConversationRecovery")]
         public async static Task Run(
-            [TimerTrigger("* */1 * * * *", RunOnStartup = false)]TimerInfo myTimer,
+            [TimerTrigger("*/1 * * * * *", RunOnStartup = false)]TimerInfo myTimer,
             ILogger log)
         {
-            log.LogInformation($"Started 'RecordingDownload' function");
-
             // TODO 5. get not processed "table.conversations"
             Domain.Models.Conversation conversation = await TableStorageService.GetNotProcessedConversationAsync();
 
@@ -37,7 +35,10 @@ namespace PureCloud.Utils.Function.TimeTrigger
 
                     // Get url for download by JobId
                     BatchDownloadJobStatusResult batch = await purecloudClient.GetJobRecordingDownloadResultByConversation(jobId);
+
                     log.LogInformation($"Bach with Job id: {jobId}, for callrecordings in conversation: {conversation.ConversationId}");
+                    await BlobStorageService.AddCallRecordingAsync(
+                        JsonConvert.SerializeObject(batch), "batchs", $"{conversation.ConversationId}.json");
 
                     if (!batch.Results.Count.Equals(0))
                     {
@@ -45,9 +46,6 @@ namespace PureCloud.Utils.Function.TimeTrigger
                         {
                             log.LogInformation($"Total callrecordings to download: {batch.Results.Count}, " +
                                 $"for conversation: {conversation.ConversationId}, in JobId: {jobId}");
-
-                            await BlobStorageService.AddCallRecordingAsync(
-                                JsonConvert.SerializeObject(batch), "batchs", $"{conversation.ConversationId}.json");
 
                             foreach (var item in batch.Results)
                             {
@@ -85,8 +83,6 @@ namespace PureCloud.Utils.Function.TimeTrigger
             {
                 log.LogInformation($"No conversation to process");
             }
-
-            log.LogInformation($"Ended 'RecordingDownload' function");
         }
     }
 }

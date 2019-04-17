@@ -19,8 +19,6 @@ namespace HttpTrigger
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "v1/users")] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation($"Started 'DownloadUsers' function");
-
             PureCloudClient purecloudClient = new PureCloudClient();
             await purecloudClient.GetAccessToken();
 
@@ -46,7 +44,6 @@ namespace HttpTrigger
                 }
             }
 
-            log.LogInformation($"Ended 'DownloadUsers' function");
             return (ActionResult)new OkResult();
         }
     }
