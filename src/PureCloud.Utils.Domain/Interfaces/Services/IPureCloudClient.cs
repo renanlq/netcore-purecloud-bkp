@@ -23,7 +23,7 @@ namespace PureCloud.Utils.Domain.Interfaces.Services
         /// Link: https://developer.mypurecloud.com/api/rest/v2/recording/#post-api-v2-recording-batchrequests
         /// </summary>
         /// <param name="conversationId">String, conversation id</param>
-        /// <returns>String, Job id</returns>
+        /// <returns>BatchDownloadJobSubmissionResult, Job result object</returns>
         Task<BatchDownloadJobSubmissionResult> BatchRecordingDownloadByConversation(string conversationId);
 
         /// <summary>
