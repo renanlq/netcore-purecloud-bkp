@@ -46,8 +46,8 @@ namespace PureCloud.Utils.Function.TimeTrigger
                                 ConversationId = item.ConversationId,
                                 Processed = false
                             });
-                        await BlobStorageService.AddConversationFromTextAsync(
-                            JsonConvert.SerializeObject(item), $"{item.ConversationId}.json");
+                        await BlobStorageService.AddToConvesrationAsync(
+                            JsonConvert.SerializeObject(item), item.ConversationId, $"conversation-{item.ConversationId}.json");
                     }
                 }
 

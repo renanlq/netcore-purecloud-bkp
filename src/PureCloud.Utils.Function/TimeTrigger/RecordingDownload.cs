@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -46,29 +47,29 @@ namespace PureCloud.Utils.Function.TimeTrigger
 
                             foreach (var item in batch.Results)
                             {
-                                await BlobStorageService.AddCallRecordingAsync(
-                                    JsonConvert.SerializeObject(item), item.ConversationId, $"{item.RecordingId}.json");
+                                await BlobStorageService.AddToConvesrationAsync(
+                                    JsonConvert.SerializeObject(item), item.ConversationId, $"recording-{item.RecordingId}.json");
 
                                 // TODO 7. download file and upload to "blob.callrecordings"
                                 if (!string.IsNullOrEmpty(item.ResultUrl))
                                 {
-                                    await BlobStorageService.AddCallRecordingAudioFromUrlAsync(
-                                        item.ResultUrl, item.ConversationId, $"{item.RecordingId}.ogg");
+                                    await BlobStorageService.AddToConvesrationAsync(
+                                        new Uri(item.ResultUrl), item.ConversationId, $"{item.RecordingId}.ogg");
                                 }
                             }
                         }
                         else if (batch.Results.Count.Equals(1))
                         {
                             log.LogInformation($"No callrecordings for conversation: {conversation.ConversationId}, in JobId: {jobId}");
-                            await BlobStorageService.AddCallRecordingAsync(
-                                JsonConvert.SerializeObject(batch), conversation.ConversationId, $"{conversation.ConversationId}.json");
+                            await BlobStorageService.AddToConvesrationAsync(
+                                JsonConvert.SerializeObject(batch), conversation.ConversationId, $"job-{jobId}.json");
                         }
                     }
                     else
                     {
                         log.LogInformation($"No results for conversation: {conversation.ConversationId}, in JobId: {jobId}");
-                        await BlobStorageService.AddCallRecordingAsync(
-                            JsonConvert.SerializeObject(batch), conversation.ConversationId, $"{conversation.ConversationId}.json");
+                        await BlobStorageService.AddToConvesrationAsync(
+                            JsonConvert.SerializeObject(batch), conversation.ConversationId, $"job-{jobId}.json");
                     }
 
                     // TODO 8. update "table.conversations" with uridownload

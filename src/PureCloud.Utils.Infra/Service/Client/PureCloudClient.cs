@@ -49,7 +49,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                     access_tokenInfo = JsonConvert.DeserializeObject<AuthTokenInfo>(jsonMessage);
                 }
                 else {
-                    await BlobStorageService.AddErrorFromTextAsync(
+                    await BlobStorageService.AddToErrorAsync(
                         JsonConvert.SerializeObject(responseMessage), "getaccesstoken", $"{DateTime.Now}.json");
                 }
             }
@@ -106,7 +106,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                     }
                     else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
                     {
-                        await BlobStorageService.AddErrorFromTextAsync(
+                        await BlobStorageService.AddToErrorAsync(
                                 JsonConvert.SerializeObject(responseMessage), "getconversationsnyinterval", $"{begin.Date}.json");
                         return new List<AnalyticsConversation>();
                     }
@@ -154,7 +154,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                     }
                     else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
                     {
-                        await BlobStorageService.AddErrorFromTextAsync(
+                        await BlobStorageService.AddToErrorAsync(
                                 JsonConvert.SerializeObject(responseMessage), "batchrecordingdownloadbyconversation", $"{conversationId}.json");
                         return result;
                     }
@@ -194,8 +194,8 @@ namespace PureCloud.Utils.Infra.Service.Client
                     }
                     else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
                     {
-                        await BlobStorageService.AddErrorFromTextAsync(
-                            JsonConvert.SerializeObject(responseMessage), "batchrecordingdownloadbyconversation", $"{jobId}.json");
+                        await BlobStorageService.AddToErrorAsync(
+                            JsonConvert.SerializeObject(responseMessage), "getjobrecordingdownloadresultbyconversation", $"{jobId}.json");
                         return result;
                     }
 
@@ -241,7 +241,7 @@ namespace PureCloud.Utils.Infra.Service.Client
 
                     else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
                     {
-                        await BlobStorageService.AddErrorFromTextAsync(
+                        await BlobStorageService.AddToErrorAsync(
                             JsonConvert.SerializeObject(responseMessage), "getavailableusers", $"{DateTime.Now}.json");
                         return result;
                     }

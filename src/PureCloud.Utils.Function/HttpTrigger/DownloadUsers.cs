@@ -40,7 +40,7 @@ namespace HttpTrigger
                                 Id = user.Id,
                                 Email = user.Email
                             });
-                        await BlobStorageService.AddUserFromTextAsync(
+                        await BlobStorageService.AddToUserAsync(
                             JsonConvert.SerializeObject(user), $"{user.Id}.json");
                     }
                 }
