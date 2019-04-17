@@ -3,7 +3,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using PureCloud.Utils.Domain.Attribute;
-using PureCloud.Utils.Domain.Models;
 using PureCloud.Utils.Infra.Service.Client;
 using PureCloud.Utils.Infra.Service.Storage;
 using PureCloudPlatform.Client.V2.Model;
@@ -30,12 +29,15 @@ namespace PureCloud.Utils.Function.TimeTrigger
                 await purecloudClient.GetAccessToken();
 
                 // Post batch download conversations
-                string jobId = await purecloudClient.BatchRecordingDownloadByConversation(conversation.ConversationId);
-                // Get url for download by JobId
+                BatchDownloadJobSubmissionResult job = await purecloudClient.BatchRecordingDownloadByConversation(conversation.ConversationId);
 
-                if (!string.IsNullOrEmpty(jobId))
+                if (job != null && !string.IsNullOrEmpty(job.Id))
                 {
+                    string jobId = job.Id;
+
+                    // Get url for download by JobId
                     BatchDownloadJobStatusResult batch = await purecloudClient.GetJobRecordingDownloadResultByConversation(jobId);
+                    log.LogInformation($"Bach: {batch.Id}, for conversation: {conversation.ConversationId}, in JobId: {jobId}");
 
                     if (!batch.Results.Count.Equals(0))
                     {
@@ -45,7 +47,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
                                 $"for conversation: {conversation.ConversationId}, in JobId: {jobId}");
 
                             await BlobStorageService.AddCallRecordingAsync(
-                                JsonConvert.SerializeObject(batch), "batch", $"{batch.Id}.json");
+                                JsonConvert.SerializeObject(batch), "batchs", $"{conversation.ConversationId}.json");
 
                             foreach (var item in batch.Results)
                             {
@@ -59,23 +61,24 @@ namespace PureCloud.Utils.Function.TimeTrigger
                                         item.ResultUrl, item.ConversationId, $"{item.RecordingId}.ogg");
                                 }
                             }
-
-                            // TODO 8. update "table.conversations" with uridownload
-                            conversation.Processed = true;
-                            await TableStorageService.UpdateConversationTableAsync(conversation);
                         }
                         else if (batch.Results.Count.Equals(1))
                         {
-                            log.LogInformation($"No callrecordings to download for conversation: " + 
-                                $"{conversation.ConversationId}, in JobId: {jobId}");
-                            await BlobStorageService.AddErrorFromTextAsync(JsonConvert.SerializeObject(batch), batch.JobId);
+                            log.LogInformation($"No callrecordings for conversation: {conversation.ConversationId}, in JobId: {jobId}");
+                            await BlobStorageService.AddErrorFromTextAsync(
+                                JsonConvert.SerializeObject(batch), $"{conversation.ConversationId}.json");
                         }
                     }
                     else
                     {
-                        log.LogInformation($"Error for conversation: {conversation.ConversationId}, in JobId: {jobId}");
-                        await BlobStorageService.AddErrorFromTextAsync(JsonConvert.SerializeObject(batch), batch.JobId);
+                        log.LogInformation($"No results for conversation: {conversation.ConversationId}, in JobId: {jobId}");
+                        await BlobStorageService.AddErrorFromTextAsync(
+                            JsonConvert.SerializeObject(batch), $"{conversation.ConversationId}.json");
                     }
+
+                    // TODO 8. update "table.conversations" with uridownload
+                    conversation.Processed = true;
+                    await TableStorageService.UpdateConversationTableAsync(conversation);
                 }
             }
             else

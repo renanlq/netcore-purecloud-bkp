@@ -116,10 +116,10 @@ namespace PureCloud.Utils.Infra.Service.Client
         /// </summary>
         /// <param name="conversationId">String, conversation id</param>
         /// <returns>String, Job id</returns>
-        public async Task<string> BatchRecordingDownloadByConversation(string conversationId)
+        public async Task<BatchDownloadJobSubmissionResult> BatchRecordingDownloadByConversation(string conversationId)
         {
             int count = 0;
-            string result = string.Empty;
+            BatchDownloadJobSubmissionResult result = new BatchDownloadJobSubmissionResult();
 
             using (HttpClient hc = new HttpClient())
             {
@@ -127,7 +127,6 @@ namespace PureCloud.Utils.Infra.Service.Client
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                 HttpResponseMessage responseMessage = new HttpResponseMessage();
-                BatchDownloadJobSubmissionResult response = new BatchDownloadJobSubmissionResult();
                 BatchDownloadJobSubmission queryParam = new BatchDownloadJobSubmission
                 {
                     BatchDownloadRequestList = new List<BatchDownloadRequest>() {
@@ -143,16 +142,11 @@ namespace PureCloud.Utils.Infra.Service.Client
                     string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
-                        response = JsonConvert.DeserializeObject<BatchDownloadJobSubmissionResult>(jsonMessage);
-                        result = response.Id;
+                        result = JsonConvert.DeserializeObject<BatchDownloadJobSubmissionResult>(jsonMessage);
                     }
-                    else if (count.Equals(3))
+                    else if (count.Equals(3) || (int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
                     {
                         return result;
-                    }
-                    else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
-                    {
-                        return string.Empty;
                     }
 
                     count++;
@@ -177,9 +171,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {_token}");
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-                BatchDownloadJobStatusResult response = new BatchDownloadJobStatusResult();
                 HttpResponseMessage responseMessage = new HttpResponseMessage();
-
                 do
                 {
                     Task.Delay(1000).Wait();
@@ -195,7 +187,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                         return new BatchDownloadJobStatusResult();
                     }
 
-                } while (!response.ExpectedResultCount.Equals(response.ResultCount));
+                } while (!result.ExpectedResultCount.Equals(result.ResultCount));
             }
 
             return result;

@@ -23,7 +23,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
             log.LogInformation($"Started 'ConversationRecovery' function");
 
             // TODO 1. get last processed date on "table.processeddates"
-            DateTime limitDate = (new DateTime(2016, 07, 1)); //DateTime.Now;
+            DateTime limitDate = (new DateTime(2016, 06, 11)); //DateTime.Now;
             ProcessedDate processedDate = await TableStorageService.GetLastProcessedDateAsync();
             processedDate = ProcessedDate.ReturnDateToProcess(processedDate);
 
