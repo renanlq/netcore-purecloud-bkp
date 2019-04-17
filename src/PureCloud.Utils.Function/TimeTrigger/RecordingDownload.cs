@@ -54,7 +54,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
                                 if (!string.IsNullOrEmpty(item.ResultUrl))
                                 {
                                     await BlobStorageService.AddToConvesrationAsync(
-                                        new Uri(item.ResultUrl), item.ConversationId, $"{item.RecordingId}.ogg");
+                                        new Uri(item.ResultUrl), item.ConversationId, $"audio-{item.RecordingId}.ogg");
                                 }
                             }
                         }
