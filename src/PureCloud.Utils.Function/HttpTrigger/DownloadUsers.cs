@@ -28,7 +28,7 @@ namespace HttpTrigger
 
             if (!users.Count.Equals(0))
             {
-                log.LogInformation($"Total users to sabe: {users.Count}");
+                log.LogInformation($"Total users to save: {users.Count}");
 
                 foreach (var user in users)
                 {

@@ -15,7 +15,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
         [FunctionName("RecordingDownload")]
         [ExceptionFilter(Name = "ConversationRecovery")]
         public async static Task Run(
-            [TimerTrigger("*/1 * * * * *", RunOnStartup = false)]TimerInfo myTimer,
+            [TimerTrigger("* */1 * * * *", RunOnStartup = false)]TimerInfo myTimer,
             ILogger log)
         {
             // TODO 5. get not processed "table.conversations"
@@ -23,18 +23,20 @@ namespace PureCloud.Utils.Function.TimeTrigger
 
             if (conversation != null)
             {
-                // TODO 6.  /api/v2/conversations/{conversationId}/recordings
+                log.LogInformation($"Starting donwload for conversation: {conversation.ConversationId}");
+
+                // TODO 6. /api/v2/conversations/{conversationId}/recordings
                 PureCloudClient purecloudClient = new PureCloudClient();
                 await purecloudClient.GetAccessToken();
 
-                // Post batch download conversations
+                // post batch download conversations
                 BatchDownloadJobSubmissionResult job = await purecloudClient.BatchRecordingDownloadByConversation(conversation.ConversationId);
 
                 if (!string.IsNullOrEmpty(job.Id))
                 {
                     string jobId = job.Id;
 
-                    // Get url for download by JobId
+                    // get url for download by JobId
                     BatchDownloadJobStatusResult batch = await purecloudClient.GetJobRecordingDownloadResultByConversation(jobId);
                     log.LogInformation($"Bach with Job id: {jobId}, for callrecordings in conversation: {conversation.ConversationId}");
 
