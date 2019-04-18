@@ -78,6 +78,12 @@ namespace PureCloud.Utils.Function.TimeTrigger
                             JsonConvert.SerializeObject(batch), conversation.ConversationId, $"job-{jobId}.json");
                     }
                 }
+                else
+                {
+                    log.LogInformation($"No job results for conversation: {conversation.ConversationId}");
+                    await BlobStorageService.AddToConvesrationAsync(
+                        JsonConvert.SerializeObject(job), conversation.ConversationId, $"no-job-result.json");
+                }
             }
             else
             {
