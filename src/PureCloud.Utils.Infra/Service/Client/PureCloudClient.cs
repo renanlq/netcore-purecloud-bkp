@@ -19,7 +19,6 @@ namespace PureCloud.Utils.Infra.Service.Client
         private const int _pageUserSize = 500;
         private readonly string _uribase = "https://api.mypurecloud.com";
         private string _token;
-        private int _pageNumber = 1;
 
         public PureCloudClient()
         {
@@ -64,7 +63,7 @@ namespace PureCloud.Utils.Infra.Service.Client
         /// <param name="begin">Datetime, begin date of interval</param>
         /// <param name="end">Datetime, end date of interval</param>
         /// <returns>List<AnalyticsConversation>, list of purecloud conversations</returns>
-        public async Task<List<AnalyticsConversation>> GetConversationsByInterval(DateTime begin, DateTime end)
+        public async Task<List<AnalyticsConversation>> GetConversationsByInterval(DateTime begin, DateTime end, int pageNumber)
         {
             List<AnalyticsConversation> result = new List<AnalyticsConversation>();
 
@@ -83,35 +82,32 @@ namespace PureCloud.Utils.Infra.Service.Client
                     Paging = new PagingSpec()
                     {
                         PageSize = _pageSize,
-                        PageNumber = _pageNumber
+                        PageNumber = pageNumber
                     }
                 };
 
-                do // passing trough pagination, due to 100 limited conversations in query response
-                {
-                    HttpResponseMessage responseMessage = await hc.PostAsync(_uribase + "/api/v2/analytics/conversations/details/query",
-                      new StringContent(queryParam.ToJson(), Encoding.UTF8, "application/json"));
+                HttpResponseMessage responseMessage = await hc.PostAsync(_uribase + "/api/v2/analytics/conversations/details/query",
+                    new StringContent(queryParam.ToJson(), Encoding.UTF8, "application/json"));
 
+                int tentatives = 0;
+                do 
+                {
                     string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
                         response = JsonConvert.DeserializeObject<AnalyticsConversationQueryResponse>(jsonMessage);
-
-                        if (response.Conversations != null)
-                        {
-                            result.AddRange(response.Conversations);
-                        }
-
-                        queryParam.Paging.PageNumber++;
+                        if (response.Conversations != null) result = response.Conversations;
                     }
                     else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
                     {
                         await BlobStorageService.AddToErrorAsync(
                                 JsonConvert.SerializeObject(responseMessage), "getconversationsnyinterval", $"{begin.Date}.json");
+
                         return new List<AnalyticsConversation>();
                     }
 
-                } while (response.Conversations != null);
+                    tentatives++;
+                } while (responseMessage.StatusCode != HttpStatusCode.OK && tentatives < 3);
             }
 
             return result;
@@ -125,7 +121,7 @@ namespace PureCloud.Utils.Infra.Service.Client
         /// <returns>BatchDownloadJobSubmissionResult, Job result object</returns>
         public async Task<BatchDownloadJobSubmissionResult> BatchRecordingDownloadByConversation(string conversationId)
         {
-            int count = 0;
+            int tentatives = 0;
             BatchDownloadJobSubmissionResult result = new BatchDownloadJobSubmissionResult();
 
             using (HttpClient hc = new HttpClient())
@@ -150,17 +146,17 @@ namespace PureCloud.Utils.Infra.Service.Client
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
                         result = JsonConvert.DeserializeObject<BatchDownloadJobSubmissionResult>(jsonMessage);
-                        if (count.Equals(3)) return result;
                     }
                     else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
                     {
                         await BlobStorageService.AddToErrorAsync(
                                 JsonConvert.SerializeObject(responseMessage), "batchrecordingdownloadbyconversation", $"{conversationId}.json");
+
                         return result;
                     }
 
-                    count++;
-                } while (responseMessage.StatusCode == HttpStatusCode.Accepted && responseMessage.StatusCode != HttpStatusCode.OK);
+                    tentatives++;
+                } while (responseMessage.StatusCode != HttpStatusCode.OK && tentatives < 3);
             }
 
             return result;
@@ -196,10 +192,11 @@ namespace PureCloud.Utils.Infra.Service.Client
                     {
                         await BlobStorageService.AddToErrorAsync(
                             JsonConvert.SerializeObject(responseMessage), "getjobrecordingdownloadresultbyconversation", $"{jobId}.json");
+
                         return result;
                     }
 
-                } while (!result.ExpectedResultCount.Equals(result.ResultCount));
+                } while (!result.ExpectedResultCount.Equals(result.ResultCount)); // ATENTION POUINT!!!
             }
 
             return result;
@@ -219,12 +216,12 @@ namespace PureCloud.Utils.Infra.Service.Client
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                 UserEntityListing response = new UserEntityListing();
-                _pageNumber = 1;
+                int pageNumber = 1;
 
                 do // passing trough pagination, due to 500 limited users from response
                 {
                     HttpResponseMessage responseMessage = await hc.GetAsync(_uribase +
-                        $"/api/v2/users?pageSize={_pageUserSize}&pageNumber={_pageNumber}");
+                        $"/api/v2/users?pageSize={_pageUserSize}&pageNumber={pageNumber}");
 
                     string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
@@ -236,7 +233,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                             result.AddRange(response.Entities);
                         }
 
-                        _pageNumber++;
+                        pageNumber++;
                     }
 
                     else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)

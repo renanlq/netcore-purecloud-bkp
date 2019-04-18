@@ -33,7 +33,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
 
                 // TODO 3. add to "table.conversations"
                 List<AnalyticsConversation> conversations = await purecloudClient.GetConversationsByInterval(
-                    processedDate.Date, processedDate.Date);
+                    processedDate.Date, processedDate.Date, processedDate.Page);
 
                 log.LogInformation($"Processing date: {processedDate.Date}, with {conversations.Count} conversations");
 
@@ -41,18 +41,28 @@ namespace PureCloud.Utils.Function.TimeTrigger
                 {
                     foreach (var item in conversations)
                     {
-                        await TableStorageService.AddToConversationAsync(
-                            new Domain.Models.Conversation() {
+                        await TableStorageService.AddConversationAsync(
+                            new Domain.Models.Conversation()
+                            {
                                 ConversationId = item.ConversationId,
                                 Processed = false
                             });
                         await BlobStorageService.AddToConvesrationAsync(
                             JsonConvert.SerializeObject(item), item.ConversationId, $"conversation-{item.ConversationId}.json");
                     }
+                    processedDate.Total += conversations.Count;
+                }
+                else
+                {
+                    // go to next date
+                    processedDate = new ProcessedDate() {
+                        Page = 0, Total = 0,
+                        Date = processedDate.Date.AddDays(1)
+                    };
                 }
 
                 // TODO 4. add processed date to "table.processeddates"
-                await TableStorageService.AddToProcessedDatesAsync(processedDate);
+                await TableStorageService.SaveProcessedDateAsync(processedDate);
             }
             else
             {

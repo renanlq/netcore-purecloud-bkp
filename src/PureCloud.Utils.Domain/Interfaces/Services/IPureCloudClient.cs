@@ -16,7 +16,7 @@ namespace PureCloud.Utils.Domain.Interfaces.Services
         /// <param name="begin">Datetime, begin date of interval</param>
         /// <param name="end">Datetime, end date of interval</param>
         /// <returns>List<AnalyticsConversation>, list of purecloud conversations</returns>
-        Task<List<AnalyticsConversation>> GetConversationsByInterval(DateTime begin, DateTime end);
+        Task<List<AnalyticsConversation>> GetConversationsByInterval(DateTime begin, DateTime end, int page);
 
         /// <summary>
         /// Batch download recordings.

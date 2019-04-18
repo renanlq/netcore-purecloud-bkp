@@ -74,7 +74,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
 
                     // TODO 8. update "table.conversations" with uridownload
                     conversation.Processed = true;
-                    await TableStorageService.UpdateConversationTableAsync(conversation);
+                    await TableStorageService.UpdateConversationAsync(conversation);
                 }
             }
             else

@@ -35,7 +35,7 @@ namespace HttpTrigger
                     var tableUser = await TableStorageService.GetUserAsync(user.Id);
                     if (tableUser == null)
                     {
-                        await TableStorageService.AddToUserAsync(
+                        await TableStorageService.AddUserAsync(
                             new PureCloud.Utils.Domain.Models.User() {
                                 Id = user.Id,
                                 Email = user.Email

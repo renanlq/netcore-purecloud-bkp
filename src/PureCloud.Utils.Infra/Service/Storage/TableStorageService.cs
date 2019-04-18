@@ -2,7 +2,6 @@
 using PureCloud.Utils.Domain.Models;
 using PureCloud.Utils.Infra.Context;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,19 +13,13 @@ namespace PureCloud.Utils.Infra.Service.Storage
         private static readonly string _processedDatesTable = Environment.GetEnvironmentVariable("storage:table:processeddates", EnvironmentVariableTarget.Process);
         private static readonly string _usersTable = Environment.GetEnvironmentVariable("storage:table:users", EnvironmentVariableTarget.Process);
 
-        public static async Task AddToConversationAsync(Conversation content)
+        public static async Task AddConversationAsync(Conversation content)
         {
             var table = await GetOrCreateTableAsync(_conversationsTable);
             await AddToTableAsync<Conversation>(content, table);
         }
-        
-        public static async Task AddToProcessedDatesAsync(ProcessedDate content)
-        {
-            var table = await GetOrCreateTableAsync(_processedDatesTable);
-            await AddToTableAsync<ProcessedDate>(content, table);
-        }
 
-        public static async Task AddToUserAsync(User content)
+        public static async Task AddUserAsync(User content)
         {
             var table = await GetOrCreateTableAsync(_usersTable);
             await AddToTableAsync<User>(content, table);
@@ -66,13 +59,33 @@ namespace PureCloud.Utils.Infra.Service.Storage
             return results.FirstOrDefault();
         }
 
-        public static async Task UpdateConversationTableAsync(Conversation content)
+        public static async Task UpdateConversationAsync(Conversation content)
         {
             var table = await GetOrCreateTableAsync(_conversationsTable);
-
             TableOperation operation = TableOperation.Merge(content);
 
             await table.ExecuteAsync(operation);
+        }
+
+        public static async Task SaveProcessedDateAsync(ProcessedDate content)
+        {
+            var table = await GetOrCreateTableAsync(_processedDatesTable);
+
+            TableQuery<ProcessedDate> query = new TableQuery<ProcessedDate>()
+                                 .Where(TableQuery.GenerateFilterConditionForDate(
+                                     "Date", QueryComparisons.Equal, content.Date));
+
+            var results = await table.ExecuteQuerySegmentedAsync(query, null);
+
+            if (results.FirstOrDefault() == null)
+            {
+                await AddToTableAsync<ProcessedDate>(content, table);
+            }
+            else
+            {
+                TableOperation operation = TableOperation.Merge(content);
+                await table.ExecuteAsync(operation);
+            }
         }
 
         private static async Task AddToTableAsync<T>(T content, CloudTable table)
