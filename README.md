@@ -23,6 +23,11 @@ Add utilities to PureCloud using Azure functions.
 5. Get audio file in s3 storage
 6. Upload to blob storage
 
+## Build Status for 'master' branch
+| PureCloud.Utils |
+| ------------- |
+|[![Build Status](https://wizsolucoes.visualstudio.com/ServicosUnificados/_apis/build/status/renanlq.purecloud-utils%20CI?branchName=master)](https://wizsolucoes.visualstudio.com/ServicosUnificados/_build/latest?definitionId=305&branchName=master)
+
 ## Info
 Example of actual PureCloud Recording Audio URL:  
 * https://apps.mypurecloud.com/directory/#/engage/admin/interactions/interactionId  
