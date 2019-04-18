@@ -98,7 +98,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                         response = JsonConvert.DeserializeObject<AnalyticsConversationQueryResponse>(jsonMessage);
                         if (response.Conversations != null) result = response.Conversations;
                     }
-                    else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
+                    else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
                     {
                         await BlobStorageService.AddToErrorAsync(
                                 JsonConvert.SerializeObject(responseMessage), "getconversationsnyinterval", $"{begin.Date}.json");
@@ -121,7 +121,6 @@ namespace PureCloud.Utils.Infra.Service.Client
         /// <returns>BatchDownloadJobSubmissionResult, Job result object</returns>
         public async Task<BatchDownloadJobSubmissionResult> BatchRecordingDownloadByConversation(string conversationId)
         {
-            int tentatives = 0;
             BatchDownloadJobSubmissionResult result = new BatchDownloadJobSubmissionResult();
 
             using (HttpClient hc = new HttpClient())
@@ -137,6 +136,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                     }
                 };
 
+                int tentatives = 0;
                 do
                 {
                     responseMessage = await hc.PostAsync(_uribase + "/api/v2/recording/batchrequests",
@@ -147,7 +147,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                     {
                         result = JsonConvert.DeserializeObject<BatchDownloadJobSubmissionResult>(jsonMessage);
                     }
-                    else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
+                    else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
                     {
                         await BlobStorageService.AddToErrorAsync(
                                 JsonConvert.SerializeObject(responseMessage), "batchrecordingdownloadbyconversation", $"{conversationId}.json");
@@ -180,7 +180,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                 HttpResponseMessage responseMessage = new HttpResponseMessage();
                 do
                 {
-                    Task.Delay(1000).Wait();
+                    Task.Delay(3000).Wait();
                     responseMessage = await hc.GetAsync(_uribase + $"/api/v2/recording/batchrequests/{jobId}");
 
                     string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
@@ -188,7 +188,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                     {
                         result = JsonConvert.DeserializeObject<BatchDownloadJobStatusResult>(jsonMessage);
                     }
-                    else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
+                    else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
                     {
                         await BlobStorageService.AddToErrorAsync(
                             JsonConvert.SerializeObject(responseMessage), "getjobrecordingdownloadresultbyconversation", $"{jobId}.json");
@@ -236,7 +236,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                         pageNumber++;
                     }
 
-                    else if ((int)responseMessage.StatusCode >= 400 && (int)responseMessage.StatusCode < 600)
+                    else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
                     {
                         await BlobStorageService.AddToErrorAsync(
                             JsonConvert.SerializeObject(responseMessage), "getavailableusers", $"{DateTime.Now}.json");

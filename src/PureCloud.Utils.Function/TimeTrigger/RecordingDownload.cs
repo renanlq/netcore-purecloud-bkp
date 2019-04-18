@@ -23,9 +23,13 @@ namespace PureCloud.Utils.Function.TimeTrigger
 
             if (conversation != null)
             {
+                // TODO 6. update "table.conversations" with uridownload
+                conversation.Processed = true;
+                await TableStorageService.UpdateConversationAsync(conversation);
+
                 log.LogInformation($"Starting donwload for conversation: {conversation.ConversationId}");
 
-                // TODO 6. /api/v2/conversations/{conversationId}/recordings
+                // TODO 7. /api/v2/conversations/{conversationId}/recordings
                 PureCloudClient purecloudClient = new PureCloudClient();
                 await purecloudClient.GetAccessToken();
 
@@ -52,7 +56,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
                                 await BlobStorageService.AddToConvesrationAsync(
                                     JsonConvert.SerializeObject(item), item.ConversationId, $"recording-{item.RecordingId}.json");
 
-                                // TODO 7. download file and upload to "blob.callrecordings"
+                                // TODO 8. download file and upload to "blob.callrecordings"
                                 if (!string.IsNullOrEmpty(item.ResultUrl))
                                 {
                                     await BlobStorageService.AddToConvesrationAsync(
@@ -73,10 +77,6 @@ namespace PureCloud.Utils.Function.TimeTrigger
                         await BlobStorageService.AddToConvesrationAsync(
                             JsonConvert.SerializeObject(batch), conversation.ConversationId, $"job-{jobId}.json");
                     }
-
-                    // TODO 8. update "table.conversations" with uridownload
-                    conversation.Processed = true;
-                    await TableStorageService.UpdateConversationAsync(conversation);
                 }
             }
             else

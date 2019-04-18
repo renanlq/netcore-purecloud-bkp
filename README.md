@@ -45,7 +45,12 @@ $ storageemulator.bat
 ```
 Start function:
 ```
-$ cd .\src\PureCloud.Utils.Function\RecordingBulkDownload.TimerTrigger\
+// download users
+$ cd .\src\PureCloud.Utils.Function\HttpTrigger\
+$ func start
+
+// donwload audio files
+$ cd .\src\PureCloud.Utils.Function\TimerTrigger\
 $ func start
 ```
 
