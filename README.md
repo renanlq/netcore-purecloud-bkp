@@ -1,8 +1,9 @@
 # PureCloud Utils (Azure Functions)
 
-## Sumary
+## Summary
 * [Purpose](#purpose)
 * [Solution](#solution)
+* [Steps](#steps)
 * [Dependencies](#dependencies)
 * [Test](#test)
 * [References](#references)
