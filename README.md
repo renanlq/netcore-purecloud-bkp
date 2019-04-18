@@ -12,7 +12,15 @@
 Add utilities to PureCloud using Azure functions.
 
 ## Solution
-![Solution architecture](https://github.com/renanlq/purecloud-utils/blob/master/solution-architecture.png)
+![Solution architecture](solution-architecture.png)
+
+## Steps
+1. Get conversations by interval
+2. Send conversations storage table
+3. Read non processed conversation
+4. Batch call recording donwload, until success job response
+5. Get audio file in s3 storage
+6. Upload to blob storage
 
 ## Info
 Example of actual PureCloud Recording Audio URL:  
