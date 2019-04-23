@@ -15,7 +15,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
     {
         [FunctionName("ConversationRecovery")]
         public async static Task Run(
-            [TimerTrigger("* */1 * * * *", RunOnStartup = false)]TimerInfo myTimer,
+            [TimerTrigger("*/1 * * * * *", RunOnStartup = false)]TimerInfo myTimer,
             ILogger log)
         {
             try
@@ -27,6 +27,9 @@ namespace PureCloud.Utils.Function.TimeTrigger
 
                 if (processedDate.Date < limitDate.Date)
                 {
+                    // update processdate page +1
+                    await TableStorageService.SaveProcessedDateAsync(processedDate);
+
                     // TODO 2. /api/v2/analytics/conversations/details/query
                     PureCloudClient purecloudClient = new PureCloudClient();
                     await purecloudClient.GetAccessToken();
@@ -51,20 +54,28 @@ namespace PureCloud.Utils.Function.TimeTrigger
                                 JsonConvert.SerializeObject(item), item.ConversationId, $"conversation-{item.ConversationId}.json");
                         }
                         processedDate.Total += conversations.Count;
+
+                        // TODO 4. add processed date to "table.processeddates"
+                        await TableStorageService.SaveProcessedDateAsync(processedDate);
                     }
                     else
                     {
-                        // go to next date
-                        processedDate = new ProcessedDate()
+                        // check if "someone" (function) added future date before "me"
+                        ProcessedDate processedDatebase = await TableStorageService.GetLastProcessedDateAsync();
+                        if (processedDatebase.Date.Equals(processedDate.Date))
                         {
-                            Page = 0,
-                            Total = 0,
-                            Date = processedDate.Date.AddDays(1)
-                        };
-                    }
+                            // go to next date
+                            processedDate = new ProcessedDate()
+                            {
+                                Page = 0,
+                                Total = 0,
+                                Date = processedDate.Date.AddDays(1)
+                            };
 
-                    // TODO 4. add processed date to "table.processeddates"
-                    await TableStorageService.SaveProcessedDateAsync(processedDate);
+                            // TODO 4. add processed date to "table.processeddates"
+                            await TableStorageService.SaveProcessedDateAsync(processedDate);
+                        }
+                    }
                 }
                 else
                 {
