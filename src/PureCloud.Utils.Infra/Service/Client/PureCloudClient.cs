@@ -17,7 +17,11 @@ namespace PureCloud.Utils.Infra.Service.Client
     {
         private const int _pageSize = 100;
         private const int _pageUserSize = 500;
-        private readonly string _uribase = "https://api.mypurecloud.com";
+
+        private static readonly string _authorizarionToken = Environment.GetEnvironmentVariable("purecloud:authorization", EnvironmentVariableTarget.Process);
+        private static readonly string _uribase = Environment.GetEnvironmentVariable("purecloud:uribase", EnvironmentVariableTarget.Process);
+        private static readonly string _uritoken = Environment.GetEnvironmentVariable("purecloud:urithoken", EnvironmentVariableTarget.Process); 
+
         private string _token;
 
         public PureCloudClient()
@@ -31,8 +35,7 @@ namespace PureCloud.Utils.Infra.Service.Client
             AuthTokenInfo access_tokenInfo = null;
             using (HttpClient hc = new HttpClient())
             {
-                hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization",
-                    $"Basic YjIwOGZjYzUtZDUyOS00ZjY1LThmM2EtZmM4YmZjNDhjOGJmOndkWm1MMGUwV0JEM1NlMTNXNnczdEwyNVlUdmFVRE9ZLXEyQ0VyaU4xcEE=");
+                hc.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Basic {_authorizarionToken}");
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                 Dictionary<string, string> dc = new Dictionary<string, string>();
@@ -40,7 +43,7 @@ namespace PureCloud.Utils.Infra.Service.Client
 
                 FormUrlEncodedContent content = new FormUrlEncodedContent(dc);
 
-                HttpResponseMessage responseMessage = await hc.PostAsync("https://login.mypurecloud.com/oauth/token", content);
+                HttpResponseMessage responseMessage = await hc.PostAsync(_uritoken, content);
 
                 if (responseMessage.StatusCode == HttpStatusCode.OK)
                 {
