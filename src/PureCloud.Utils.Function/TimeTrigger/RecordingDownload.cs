@@ -13,7 +13,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
     {
         [FunctionName("RecordingDownload")]
         public async static Task Run(
-            [TimerTrigger("* */1 * * * *", RunOnStartup = false)]TimerInfo myTimer,
+            [TimerTrigger("*/10 * * * * *", RunOnStartup = false)]TimerInfo myTimer,
             ILogger log)
         {
             try
@@ -97,11 +97,14 @@ namespace PureCloud.Utils.Function.TimeTrigger
                     log.LogInformation($"Exception for conversation: {conversation.ConversationId}");
                     await BlobStorageService.AddToErrorAsync(
                         JsonConvert.SerializeObject(ex), "exception", $"{conversation.ConversationId}.json");
+
+                    conversation.Processed = false;
+                    await TableStorageService.UpdateConversationAsync(conversation);
                 }
             }
             catch (Exception ex)
             {
-                log.LogInformation($"Exception: {ex.Message}");
+                log.LogInformation($"Exception not expected: {ex.Message}");
                 await BlobStorageService.AddToErrorAsync(
                     JsonConvert.SerializeObject(ex), "exception", $"{DateTime.Now}.json");
             }
