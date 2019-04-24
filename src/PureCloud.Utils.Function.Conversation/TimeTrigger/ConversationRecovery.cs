@@ -1,3 +1,4 @@
+using Microsoft.ApplicationInsights;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -83,8 +84,10 @@ namespace PureCloud.Utils.Function.TimeTrigger
             catch (Exception ex)
             {
                 log.LogInformation($"Exception: {ex.Message}");
-                await BlobStorageService.AddToErrorAsync(
-                    JsonConvert.SerializeObject(ex), "exception", $"{DateTime.Now}.json");
+
+                TelemetryClient telemetry = new TelemetryClient();
+                telemetry.InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
+                telemetry.TrackException(ex);
             }
         }
 

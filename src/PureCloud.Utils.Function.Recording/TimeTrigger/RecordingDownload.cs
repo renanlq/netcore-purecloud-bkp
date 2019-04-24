@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -92,22 +93,22 @@ namespace PureCloud.Utils.Function.TimeTrigger
                         log.LogInformation($"No conversation to process");
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    log.LogInformation($"Exception for conversation: {conversation.ConversationId}");
-                    await BlobStorageService.AddToErrorAsync(
-                        JsonConvert.SerializeObject(ex), "exception", $"{conversation.ConversationId}.json");
-
                     conversation.Tentatives++;
                     conversation.Processed = false;
                     await TableStorageService.UpdateConversationAsync(conversation);
+
+                    log.LogInformation($"Exception for conversation: {conversation.ConversationId}");
                 }
             }
             catch (Exception ex)
             {
                 log.LogInformation($"Exception not expected: {ex.Message}");
-                await BlobStorageService.AddToErrorAsync(
-                    JsonConvert.SerializeObject(ex), "exception", $"{DateTime.Now}.json");
+
+                TelemetryClient telemetry = new TelemetryClient();
+                telemetry.InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
+                telemetry.TrackException(ex);
             }
         }
     }

@@ -1,3 +1,4 @@
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -53,8 +54,10 @@ namespace HttpTrigger
             catch (Exception ex)
             {
                 log.LogInformation($"Exception: {ex.Message}");
-                await BlobStorageService.AddToErrorAsync(
-                    JsonConvert.SerializeObject(ex), "exception", $"{DateTime.Now}.json");
+
+                TelemetryClient telemetry = new TelemetryClient();
+                telemetry.InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
+                telemetry.TrackException(ex);
 
                 return (ActionResult) new StatusCodeResult(500);
             }
