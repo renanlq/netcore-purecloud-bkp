@@ -6,7 +6,8 @@
 
 # User-specific files
 *.suo
-#*.user
+*.csproj.user
+*.dbproj.user
 *.userosscache
 *.sln.docstates
 
