@@ -11,10 +11,9 @@ namespace PureCloud.Utils.Function.TimeTrigger
 {
     public static class RecordingDownload
     {
-        // TODO 9. Make it another function
         [FunctionName("RecordingDownload")]
         public async static Task Run(
-            [TimerTrigger("*/10 * * * * *", RunOnStartup = false)]TimerInfo myTimer,
+            [TimerTrigger("*/1 * * * * *", RunOnStartup = false)]TimerInfo myTimer,
             ILogger log)
         {
             try
