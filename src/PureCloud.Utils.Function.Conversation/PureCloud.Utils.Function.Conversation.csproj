@@ -20,7 +20,4 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="QueueTrigger\" />
-  </ItemGroup>
 </Project>

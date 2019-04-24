@@ -44,19 +44,13 @@ namespace PureCloud.Utils.Function.TimeTrigger
 
                     if (!conversations.Count.Equals(0))
                     {
+                        List<Task> taskList = new List<Task>();
                         foreach (var item in conversations)
                         {
-                            await TableStorageService.AddConversationAsync(
-                                new Domain.Models.Conversation()
-                                {
-                                    ConversationId = item.ConversationId,
-                                    Processed = false,
-                                    Tentatives = 0,
-                                    Version = _appversion
-                                });
-                            await BlobStorageService.AddToConvesrationAsync(
-                                JsonConvert.SerializeObject(item), item.ConversationId, $"conversation-{item.ConversationId}.json");
+                            taskList.Add(SaveBlob(item));
                         }
+                        await Task.WhenAll(taskList.ToArray());
+
                         processedDate.Total += conversations.Count;
 
                         // TODO 4. add processed date to "table.processeddates"
@@ -92,6 +86,23 @@ namespace PureCloud.Utils.Function.TimeTrigger
                 await BlobStorageService.AddToErrorAsync(
                     JsonConvert.SerializeObject(ex), "exception", $"{DateTime.Now}.json");
             }
+        }
+
+        private static async Task SaveBlob(AnalyticsConversation item)
+        {
+            Task taskA, taskB;
+            taskA = TableStorageService.AddConversationAsync(
+                new Domain.Models.Conversation()
+                {
+                    ConversationId = item.ConversationId,
+                    Processed = false,
+                    Tentatives = 0,
+                    Version = _appversion
+                });
+            taskB = BlobStorageService.AddToConvesrationAsync(
+                JsonConvert.SerializeObject(item), item.ConversationId, $"conversation-{item.ConversationId}.json");
+
+            await Task.WhenAll(taskA, taskB);
         }
     }
 }

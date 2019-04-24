@@ -20,7 +20,7 @@ namespace PureCloud.Utils.Infra.Service.Client
 
         private static readonly string _authorizarionToken = Environment.GetEnvironmentVariable("purecloud:authorization", EnvironmentVariableTarget.Process);
         private static readonly string _uribase = Environment.GetEnvironmentVariable("purecloud:uribase", EnvironmentVariableTarget.Process);
-        private static readonly string _uritoken = Environment.GetEnvironmentVariable("purecloud:urithoken", EnvironmentVariableTarget.Process); 
+        private static readonly string _uritoken = Environment.GetEnvironmentVariable("purecloud:uritoken", EnvironmentVariableTarget.Process); 
 
         private string _token;
 
