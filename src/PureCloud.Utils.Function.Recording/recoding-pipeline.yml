@@ -27,3 +27,4 @@ jobs:
     projectPath: '**/*.Function.Recording.csproj'
     buildConfiguration: 'Release'
     artifactstagingdirectory: $(build.artifactstagingdirectory)
+    artifactName: 'recording'

@@ -26,3 +26,4 @@ jobs:
     projectPath: '**/*.Function.Conversation.csproj'
     buildConfiguration: 'Release'
     artifactstagingdirectory: $(build.artifactstagingdirectory)
+    artifactName: 'conversation'

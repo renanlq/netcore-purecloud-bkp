@@ -30,4 +30,5 @@ jobs:
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Artifact'
     inputs:
+      artifactName: ${{parameters.artifactName}}
       pathtoPublish: ${{parameters.artifactstagingdirectory}}
