@@ -98,6 +98,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
                     await BlobStorageService.AddToErrorAsync(
                         JsonConvert.SerializeObject(ex), "exception", $"{conversation.ConversationId}.json");
 
+                    conversation.Tentatives++;
                     conversation.Processed = false;
                     await TableStorageService.UpdateConversationAsync(conversation);
                 }

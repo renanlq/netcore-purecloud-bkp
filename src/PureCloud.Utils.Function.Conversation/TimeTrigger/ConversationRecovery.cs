@@ -13,6 +13,8 @@ namespace PureCloud.Utils.Function.TimeTrigger
 {
     public static class ConversationRecovery
     {
+        private static readonly string _appversion = Environment.GetEnvironmentVariable("appversion", EnvironmentVariableTarget.Process);
+
         [FunctionName("ConversationRecovery")]
         public async static Task Run(
             [TimerTrigger("*/1 * * * * *", RunOnStartup = false)]TimerInfo myTimer,
@@ -48,7 +50,9 @@ namespace PureCloud.Utils.Function.TimeTrigger
                                 new Domain.Models.Conversation()
                                 {
                                     ConversationId = item.ConversationId,
-                                    Processed = false
+                                    Processed = false,
+                                    Tentatives = 0,
+                                    Version = _appversion
                                 });
                             await BlobStorageService.AddToConvesrationAsync(
                                 JsonConvert.SerializeObject(item), item.ConversationId, $"conversation-{item.ConversationId}.json");
