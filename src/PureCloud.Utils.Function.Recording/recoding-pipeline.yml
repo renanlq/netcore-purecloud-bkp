@@ -22,9 +22,9 @@ resources:
 jobs:
 - template: /templates/function-build.yml
   parameters:
-    name: FunctionName
+    name: Recording.Function
     vmImage: 'Ubuntu-16.04'
-    projectPath: '**/*.Function.Recording.csproj'
+    buildprojects: '**/*.Function.Recording.csproj'
     buildConfiguration: 'Release'
     artifactstagingdirectory: $(build.artifactstagingdirectory)
     artifactName: 'recording'

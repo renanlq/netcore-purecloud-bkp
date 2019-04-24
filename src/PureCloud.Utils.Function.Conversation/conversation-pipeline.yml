@@ -21,9 +21,9 @@ resources:
 jobs:
 - template: /templates/function-build.yml
   parameters:
-    name: FunctionName
+    name: Conversation.Function
     vmImage: 'Ubuntu-16.04'
-    projectPath: '**/*.Function.Conversation.csproj'
+    buildprojects: '**/*.Function.Conversation.csproj'
     buildConfiguration: 'Release'
     artifactstagingdirectory: $(build.artifactstagingdirectory)
     artifactName: 'conversation'
