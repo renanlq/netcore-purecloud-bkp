@@ -17,7 +17,7 @@ resources:
 - repo: self
 
 jobs:
-- template: templates/function-build.yml
+- template: /templates/function-build.yml
   parameters:
     name: FunctionName
     vmImage: 'Ubuntu-16.04'
