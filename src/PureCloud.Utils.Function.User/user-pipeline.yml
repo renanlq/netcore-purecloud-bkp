@@ -21,7 +21,7 @@ resources:
 jobs:
 - template: /templates/function-build.yml
   parameters:
-    name: User.Function
+    name: UserFunction
     vmImage: 'Ubuntu-16.04'
     buildprojects: '**/*.Function.User.csproj'
     buildConfiguration: 'Release'

@@ -22,7 +22,7 @@ resources:
 jobs:
 - template: /templates/function-build.yml
   parameters:
-    name: Recording.Function
+    name: RecordingFunction
     vmImage: 'Ubuntu-16.04'
     buildprojects: '**/*.Function.Recording.csproj'
     buildConfiguration: 'Release'

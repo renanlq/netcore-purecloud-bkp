@@ -21,7 +21,7 @@ resources:
 jobs:
 - template: /templates/function-build.yml
   parameters:
-    name: Conversation.Function
+    name: ConversationFunction
     vmImage: 'Ubuntu-16.04'
     buildprojects: '**/*.Function.Conversation.csproj'
     buildConfiguration: 'Release'
