@@ -1,0 +1,33 @@
+# File: templates/function-build.yml
+
+jobs:
+- job: ${{parameters.name}}
+  pool: 
+    vmImage: ${{parameters.vmImage}}
+  steps:
+  - task: DotNetCoreCLI@2
+    displayName: Restore
+    inputs:
+      command: restore
+      projects: ${{parameters.buildprojects}}
+
+  - task: DotNetCoreCLI@2
+    displayName: Build
+    inputs:
+      projects: ${{parameters.buildprojects}}
+      arguments: '--configuration ${{parameters.buildConfiguration}}'
+
+  - task: DotNetCoreCLI@2
+    displayName: Publish
+    inputs:
+      command: publish
+      arguments: '--configuration ${{parameters.buildConfiguration}} --output ${{parameters.artifactstagingdirectory}}'
+      projects: ${{parameters.buildprojects}}
+      publishWebProjects: false
+      modifyOutputPath: true
+      zipAfterPublish: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact'
+    inputs:
+      pathtoPublish: ${{parameters.artifactstagingdirectory}}

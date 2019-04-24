@@ -13,6 +13,9 @@ namespace PureCloud.Utils.Domain.Models
 
         [JsonProperty("processed")]
         public bool Processed { get; set; }
+
+        [JsonProperty("version")]
+        public bool Version { get; set; }
     }
 
     public class ConversationResponse
