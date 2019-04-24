@@ -12,6 +12,8 @@ trigger:
     - master
   paths:
     exclude:
+    - src/PureCloud.Utils.Function.Conversation/*
+    - src/PureCloud.Utils.Function.User/*
     - README.md
 
 resources:

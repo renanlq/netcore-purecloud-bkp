@@ -11,6 +11,8 @@ trigger:
     - master
   paths:
     exclude:
+    - src/PureCloud.Utils.Function.Recording/*
+    - src/PureCloud.Utils.Function.User/*
     - README.md
 
 resources:
