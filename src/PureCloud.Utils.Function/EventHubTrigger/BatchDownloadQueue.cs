@@ -17,7 +17,7 @@ namespace PureCloud.Utils.Function.EventHubTrigger
         [FunctionName("BatchDownloadQueue")]
         public static async void Run(
             [EventHubTrigger("convesationhub", Connection = "EventhubConnectionString")]EventData[] events,
-            [EventHub("convesationhub", Connection = "ServiceBusConnectionString")]IAsyncCollector<string> convesationhub,
+            [EventHub("convesationhub", Connection = "EventhubConnectionString")]IAsyncCollector<string> convesationhub,
             [ServiceBus("jobqueue", Connection = "ServiceBusConnectionString", EntityType = EntityType.Queue)]IAsyncCollector<string> jobQueue,
             ILogger log)
         {
