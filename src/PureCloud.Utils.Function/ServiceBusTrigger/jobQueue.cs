@@ -30,7 +30,7 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                 BatchDownloadJobStatusResult batch = await purecloudClient.GetJobRecordingDownloadResultByConversation(jobId);
 
                 // TODO: end when resultcount == resultaudios
-                if (batch.ExpectedResultCount.Equals(batch.ResultCount))
+                if (!batch.ExpectedResultCount.Equals(0) && batch.ExpectedResultCount.Equals(batch.ResultCount))
                 {
                     //List<Task> taskList = new List<Task>(); // to mutch performatic kkkk :P
                     foreach (var item in batch.Results)
@@ -76,6 +76,8 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                 TelemetryClient telemetry = new TelemetryClient();
                 telemetry.InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
                 telemetry.TrackException(ex);
+
+                log.LogInformation($"Exception during execution: {ex.Message}");
 
                 do
                 {

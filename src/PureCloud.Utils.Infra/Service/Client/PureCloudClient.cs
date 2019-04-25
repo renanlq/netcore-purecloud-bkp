@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -99,6 +100,10 @@ namespace PureCloud.Utils.Infra.Service.Client
                         response = JsonConvert.DeserializeObject<AnalyticsConversationQueryResponse>(jsonMessage);
                         if (response.Conversations != null) result = response.Conversations;
                     }
+                    else if (responseMessage.StatusCode.Equals(429))
+                    {
+                        await DeplayTime(responseMessage);
+                    }
                     else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
                     {
                         throw new Exception(jsonMessage);
@@ -144,6 +149,10 @@ namespace PureCloud.Utils.Infra.Service.Client
                     {
                         result = JsonConvert.DeserializeObject<BatchDownloadJobSubmissionResult>(jsonMessage);
                     }
+                    else if (responseMessage.StatusCode.Equals(429))
+                    {
+                        await DeplayTime(responseMessage);
+                    }
                     else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
                     {
                         throw new Exception(jsonMessage);
@@ -180,6 +189,10 @@ namespace PureCloud.Utils.Infra.Service.Client
                 if (responseMessage.IsSuccessStatusCode)
                 {
                     result = JsonConvert.DeserializeObject<BatchDownloadJobStatusResult>(jsonMessage);
+                }
+                else if (responseMessage.StatusCode.Equals(429))
+                {
+                    await DeplayTime(responseMessage);
                 }
                 else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
                 {
@@ -233,5 +246,16 @@ namespace PureCloud.Utils.Infra.Service.Client
 
             return result;
         }
+
+        private static async Task DeplayTime(HttpResponseMessage responseMessage)
+        {
+            HttpHeaders headers = responseMessage.Headers;
+            if (headers.TryGetValues("retry-after", out IEnumerable<string> values))
+            {
+                string redotime = values.First();
+                await Task.Delay(Convert.ToInt32(redotime) * 1000);
+            }
+        }
+
     }
 }

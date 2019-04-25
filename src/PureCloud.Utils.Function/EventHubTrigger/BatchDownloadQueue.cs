@@ -49,6 +49,8 @@ namespace PureCloud.Utils.Function.EventHubTrigger
                 telemetry.InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
                 telemetry.TrackException(ex);
 
+                log.LogInformation($"Exception during execution: {ex.Message}");
+
                 do
                 {
                     try
