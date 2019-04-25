@@ -35,7 +35,7 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                 // TODO: end when resultcount == resultaudios
                 if (batch.ExpectedResultCount.Equals(batch.ResultCount))
                 {
-                    List<Task> taskList = new List<Task>();
+                    //List<Task> taskList = new List<Task>(); // to mutch performatic kkkk :P
                     foreach (var item in batch.Results)
                     {
                         if (!string.IsNullOrEmpty(item.ResultUrl))
@@ -57,16 +57,16 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                                 }
 
                                 CloudBlockBlob convesrationBlob = container.GetBlockBlobReference($"{item.ConversationId}-{item.RecordingId}.{extension}");
-                                taskList.Add(convesrationBlob.StartCopyAsync(new Uri(item.ResultUrl)));
+                                await convesrationBlob.StartCopyAsync(new Uri(item.ResultUrl));
                             }
                             else
                             {
                                 CloudBlockBlob convesrationBlob = container.GetBlockBlobReference($"{item.ConversationId}.error");
-                                taskList.Add(convesrationBlob.UploadTextAsync(JsonConvert.SerializeObject(item)));
+                                await convesrationBlob.UploadTextAsync(JsonConvert.SerializeObject(item));
                             }
                         }
                     }
-                    await Task.WhenAll(taskList.ToArray());
+                    //await Task.WhenAll(taskList.ToArray()); // to mutch performatic kkkk :P
                 }
                 else
                 {

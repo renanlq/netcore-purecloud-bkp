@@ -39,17 +39,17 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                 log.LogInformation($"Processing date: {datePage.Date}, at page: {datePage.Page}, with {conversations.Count} conversations");
 
                 // TODO: add on "conversationQueue"
-                List<Task> taskList = new List<Task>();
+                //List<Task> taskList = new List<Task>(); // to mutch performatic kkkk :P
                 foreach (var item in conversations)
                 {
                     string conversationJson = JsonConvert.SerializeObject(item);
-                    taskList.Add(convesationhub.AddAsync(conversationJson));
+                    await convesationhub.AddAsync(conversationJson));
 
                     // add conversationJson to blob storage
                     CloudBlockBlob convesrationBlob = container.GetBlockBlobReference($"{item.ConversationId}-conversation.json");
-                    taskList.Add(convesrationBlob.UploadTextAsync(conversationJson)); 
+                    await convesrationBlob.UploadTextAsync(conversationJson)
                 }
-                await Task.WhenAll(taskList.ToArray());
+                //await Task.WhenAll(taskList.ToArray()); // to mutch performatic kkkk :P
 
                 // TODO: add new page on same date
                 if (conversations.Count.Equals(100))

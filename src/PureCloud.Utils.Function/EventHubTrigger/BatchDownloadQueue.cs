@@ -33,7 +33,7 @@ namespace PureCloud.Utils.Function.EventHubTrigger
 
                     AnalyticsConversation conversation = JsonConvert.DeserializeObject<AnalyticsConversation>(messageBody);
                     conversations.Add(conversation);
-                    await Task.Yield();
+                    //await Task.Yield();
                 }
 
                 log.LogInformation($"Total conversations: {conversations.Count}");
@@ -58,13 +58,13 @@ namespace PureCloud.Utils.Function.EventHubTrigger
                     {
                         await Task.Delay(Convert.ToInt32(Environment.GetEnvironmentVariable("deplaytime")));
 
-                        List<Task> taskList = new List<Task>();
+                        //List<Task> taskList = new List<Task>(); // to mutch performatic kkkk :P
                         foreach (EventData eventData in events)
                         {
                             string messageBody = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
-                            taskList.Add(convesationhub.AddAsync(messageBody));
+                            await convesationhub.AddAsync(messageBody);
                         }
-                        await Task.WhenAll(taskList);
+                        //await Task.WhenAll(taskList); // to mutch performatic kkkk :P
                         break;
                     }
                     catch { }
