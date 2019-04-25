@@ -29,7 +29,7 @@ v2:
 ## Build Status for 'master' branch
 | PureCloud.Utils |
 | ------------- |
-|[![Build Status](https://wizsolucoes.visualstudio.com/ServicosUnificados/_apis/build/status/renanlq.purecloud-utils%20CI?branchName=master)](https://wizsolucoes.visualstudio.com/ServicosUnificados/_build/latest?definitionId=305&branchName=master)
+|[![Build Status](https://dev.azure.com/purecloud-utils/_apis/build/status/renanlq.purecloud-utils%20CI?branchName=master)](https://dev.azure.com/purecloud-utils/_build/latest?definitionId=305&branchName=master)
 
 ## Info
 Example of actual PureCloud Recording Audio URL:  

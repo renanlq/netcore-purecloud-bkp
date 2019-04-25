@@ -1,0 +1,466 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "serverfarms_EastUSPlan_name": {
+            "defaultValue": "EastUSPlan",
+            "type": "String"
+        },
+        "sites_fn_backuppurecloud_name": {
+            "defaultValue": "fn-backuppurecloud",
+            "type": "String"
+        },
+        "components_fn_backuppurecloud_name": {
+            "defaultValue": "fn-backuppurecloud",
+            "type": "String"
+        },
+        "namespaces_ehub_backuppurecloud_name": {
+            "defaultValue": "ehub-backuppurecloud",
+            "type": "String"
+        },
+        "namespaces_sbus_backuppurecloud_name": {
+            "defaultValue": "sbus-backuppurecloud",
+            "type": "String"
+        },
+        "storageAccounts_backuppurecloud001_name": {
+            "defaultValue": "backuppurecloud001",
+            "type": "String"
+        },
+        "alertrules_Failure_Anomalies___fn_backuppurecloud_name": {
+            "defaultValue": "Failure Anomalies - fn-backuppurecloud",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.EventHub/namespaces",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('namespaces_ehub_backuppurecloud_name')]",
+            "location": "East US",
+            "sku": {
+                "name": "Standard",
+                "tier": "Standard",
+                "capacity": 5
+            },
+            "properties": {
+                "isAutoInflateEnabled": true,
+                "maximumThroughputUnits": 5
+            }
+        },
+        {
+            "type": "microsoft.insights/components",
+            "apiVersion": "2015-05-01",
+            "name": "[parameters('components_fn_backuppurecloud_name')]",
+            "location": "eastus",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web",
+                "Request_Source": "IbizaWebAppExtensionCreate"
+            }
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('namespaces_sbus_backuppurecloud_name')]",
+            "location": "East US",
+            "sku": {
+                "name": "Basic",
+                "tier": "Basic"
+            },
+            "properties": {
+                "provisioningState": "Succeeded",
+                "metricId": "[concat('53f***2bf:', parameters('namespaces_sbus_backuppurecloud_name'))]",
+                "createdAt": "2019-04-24T20:55:42.12Z",
+                "updatedAt": "2019-04-24T20:56:06.47Z",
+                "serviceBusEndpoint": "[concat('https://', parameters('namespaces_sbus_backuppurecloud_name'), '.servicebus.windows.net:443/')]",
+                "status": "Active"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2018-07-01",
+            "name": "[parameters('storageAccounts_backuppurecloud001_name')]",
+            "location": "eastus",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": false,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "enabled": true
+                        },
+                        "blob": {
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2016-09-01",
+            "name": "[parameters('serverfarms_EastUSPlan_name')]",
+            "location": "East US",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
+            },
+            "kind": "functionapp",
+            "properties": {
+                "name": "[parameters('serverfarms_EastUSPlan_name')]",
+                "perSiteScaling": false,
+                "reserved": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('namespaces_ehub_backuppurecloud_name'), '/fn-backuppurecloud')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_ehub_backuppurecloud_name'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Send"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('namespaces_ehub_backuppurecloud_name'), '/RootManageSharedAccessKey')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_ehub_backuppurecloud_name'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('namespaces_ehub_backuppurecloud_name'), '/conversationhub')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_ehub_backuppurecloud_name'))]"
+            ],
+            "properties": {
+                "messageRetentionInDays": 1,
+                "partitionCount": 2,
+                "status": "Active"
+            }
+        },
+        {
+            "type": "microsoft.insights/alertrules",
+            "apiVersion": "2014-04-01",
+            "name": "[parameters('alertrules_Failure_Anomalies___fn_backuppurecloud_name')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('microsoft.insights/components', parameters('components_fn_backuppurecloud_name'))]"
+            ],
+            "tags": {
+                "hidden-link:/subscriptions/53f***2bf/resourceGroups/backuppurecloud-rg/providers/microsoft.insights/components/fn-backuppurecloud": "Resource"
+            },
+            "properties": {
+                "name": "[parameters('alertrules_Failure_Anomalies___fn_backuppurecloud_name')]",
+                "isEnabled": true,
+                "condition": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+                    "dataSource": {
+                        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+                        "resourceUri": "[resourceId('microsoft.insights/components', parameters('components_fn_backuppurecloud_name'))]",
+                        "metricName": "advanced::A31***F10::ewA***A=="
+                    },
+                    "operator": "GreaterThan",
+                    "threshold": 2,
+                    "windowSize": "PT1H"
+                },
+                "action": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+                    "sendToServiceOwners": true,
+                    "customEmails": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces/AuthorizationRules",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('namespaces_sbus_backuppurecloud_name'), '/fn-backuppurecloud')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('namespaces_sbus_backuppurecloud_name'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Send"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces/AuthorizationRules",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('namespaces_sbus_backuppurecloud_name'), '/RootManageSharedAccessKey')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('namespaces_sbus_backuppurecloud_name'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces/queues",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('namespaces_sbus_backuppurecloud_name'), '/jobqueue')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('namespaces_sbus_backuppurecloud_name'))]"
+            ],
+            "properties": {
+                "lockDuration": "PT5M",
+                "maxSizeInMegabytes": 1024,
+                "requiresDuplicateDetection": false,
+                "requiresSession": false,
+                "defaultMessageTimeToLive": "P14D",
+                "deadLetteringOnMessageExpiration": true,
+                "enableBatchedOperations": true,
+                "duplicateDetectionHistoryTimeWindow": "PT10M",
+                "maxDeliveryCount": 10,
+                "status": "Active",
+                "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+                "enablePartitioning": false,
+                "enableExpress": false
+            }
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces/queues",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('namespaces_sbus_backuppurecloud_name'), '/pagequeue')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('namespaces_sbus_backuppurecloud_name'))]"
+            ],
+            "properties": {
+                "lockDuration": "PT30S",
+                "maxSizeInMegabytes": 1024,
+                "requiresDuplicateDetection": false,
+                "requiresSession": false,
+                "defaultMessageTimeToLive": "P14D",
+                "deadLetteringOnMessageExpiration": true,
+                "enableBatchedOperations": true,
+                "duplicateDetectionHistoryTimeWindow": "PT10M",
+                "maxDeliveryCount": 10,
+                "status": "Active",
+                "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+                "enablePartitioning": false,
+                "enableExpress": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "name": "[parameters('sites_fn_backuppurecloud_name')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_EastUSPlan_name'))]"
+            ],
+            "kind": "functionapp",
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat(parameters('sites_fn_backuppurecloud_name'), '.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "[concat(parameters('sites_fn_backuppurecloud_name'), '.scm.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_EastUSPlan_name'))]",
+                "reserved": false,
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": false,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 1536,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2016-08-01",
+            "name": "[concat(parameters('sites_fn_backuppurecloud_name'), '/web')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_fn_backuppurecloud_name'))]"
+            ],
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "phpVersion": "5.6",
+                "pythonVersion": "",
+                "nodeVersion": "",
+                "linuxFxVersion": "",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": "VS2017",
+                "httpLoggingEnabled": false,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "$fn-backuppurecloud",
+                "scmType": "VSTSRM",
+                "use32BitWorkerProcess": false,
+                "webSocketsEnabled": false,
+                "alwaysOn": false,
+                "appCommandLine": "",
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": false,
+                        "virtualDirectories": null
+                    }
+                ],
+                "winAuthAdminState": 0,
+                "winAuthTenantState": 0,
+                "customAppPoolIdentityAdminState": false,
+                "customAppPoolIdentityTenantState": false,
+                "loadBalancing": "LeastRequests",
+                "routingRules": [],
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "vnetName": "",
+                "siteAuthEnabled": false,
+                "siteAuthSettings": {
+                    "enabled": null,
+                    "unauthenticatedClientAction": null,
+                    "tokenStoreEnabled": null,
+                    "allowedExternalRedirectUrls": null,
+                    "defaultProvider": null,
+                    "clientId": null,
+                    "clientSecret": null,
+                    "clientSecretCertificateThumbprint": null,
+                    "issuer": null,
+                    "allowedAudiences": null,
+                    "additionalLoginParams": null,
+                    "isAadAutoProvisioned": false,
+                    "googleClientId": null,
+                    "googleClientSecret": null,
+                    "googleOAuthScopes": null,
+                    "facebookAppId": null,
+                    "facebookAppSecret": null,
+                    "facebookOAuthScopes": null,
+                    "twitterConsumerKey": null,
+                    "twitterConsumerSecret": null,
+                    "microsoftAccountClientId": null,
+                    "microsoftAccountClientSecret": null,
+                    "microsoftAccountOAuthScopes": null
+                },
+                "cors": {
+                    "allowedOrigins": [
+                        "https://functions.azure.com",
+                        "https://functions-staging.azure.com",
+                        "https://functions-next.azure.com"
+                    ],
+                    "supportCredentials": false
+                },
+                "localMySqlEnabled": false,
+                "http20Enabled": true,
+                "minTlsVersion": "1.2",
+                "ftpsState": "Disabled",
+                "reservedInstanceCount": 0
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2016-08-01",
+            "name": "[concat(parameters('sites_fn_backuppurecloud_name'), '/084***a02')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_fn_backuppurecloud_name'))]"
+            ],
+            "properties": {
+                "id": "084***a02",
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "VSTS",
+                "message": "{\"type\":\"deployment\",\"commitId\":\"60b***b57\",\"buildId\":\"6233\",\"releaseId\":\"186\",\"buildNumber\":\"20190425.5\",\"releaseName\":\"Release-15\",\"repoProvider\":\"GitHub\",\"repoName\":\"renanlq/purecloud-utils\",\"collectionUrl\":\"https://dev.azure.com/\",\"teamProject\":\"478***0b5\",\"slotName\":\"production\"}",
+                "start_time": "2019-04-25T05:10:12.9535506Z",
+                "end_time": "2019-04-25T05:10:27.7038372Z",
+                "active": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2016-08-01",
+            "name": "[concat(parameters('sites_fn_backuppurecloud_name'), '/', parameters('sites_fn_backuppurecloud_name'), '.azurewebsites.net')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_fn_backuppurecloud_name'))]"
+            ],
+            "properties": {
+                "siteName": "fn-backuppurecloud",
+                "hostNameType": "Verified"
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('namespaces_ehub_backuppurecloud_name'), '/conversationhub/$Default')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('namespaces_ehub_backuppurecloud_name'), 'conversationhub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_ehub_backuppurecloud_name'))]"
+            ],
+            "properties": {}
+        }
+    ]
+}
