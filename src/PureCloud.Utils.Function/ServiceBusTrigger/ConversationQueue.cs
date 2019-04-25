@@ -43,11 +43,11 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                 foreach (var item in conversations)
                 {
                     string conversationJson = JsonConvert.SerializeObject(item);
-                    await convesationhub.AddAsync(conversationJson));
+                    await convesationhub.AddAsync(conversationJson);
 
                     // add conversationJson to blob storage
                     CloudBlockBlob convesrationBlob = container.GetBlockBlobReference($"{item.ConversationId}-conversation.json");
-                    await convesrationBlob.UploadTextAsync(conversationJson)
+                    await convesrationBlob.UploadTextAsync(conversationJson);
                 }
                 //await Task.WhenAll(taskList.ToArray()); // to mutch performatic kkkk :P
 
