@@ -13,7 +13,10 @@
 Add utilities to PureCloud using Azure functions.
 
 ## Solution
+v1:
 ![Solution architecture](solution-architecture.png)
+
+v2:
 
 ## Steps
 1. Get conversations by interval
