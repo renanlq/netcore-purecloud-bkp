@@ -32,38 +32,42 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                 // TODO: end when resultcount == resultaudios
                 if (!batch.ExpectedResultCount.Equals(0) && batch.ExpectedResultCount.Equals(batch.ResultCount))
                 {
-                    //List<Task> taskList = new List<Task>(); // to mutch performatic kkkk :P
-                    foreach (var item in batch.Results)
+                    if (batch.Results != null)
                     {
-                        if (!string.IsNullOrEmpty(item.ResultUrl))
+                        //List<Task> taskList = new List<Task>(); // to mutch performatic kkkk :P
+                        foreach (var item in batch.Results)
                         {
-                            if (string.IsNullOrEmpty(item.ErrorMsg))
+                            if (!string.IsNullOrEmpty(item.ResultUrl))
                             {
-                                var extension = string.Empty;
-                                switch (item.ContentType)
+                                if (string.IsNullOrEmpty(item.ErrorMsg))
                                 {
-                                    case "audio/ogg":
-                                        extension = "ogg";
-                                        break;
-                                    case "application/zip":
-                                        extension = "zip";
-                                        break;
-                                    default:
-                                        extension = "none";
-                                        break;
-                                }
+                                    var extension = string.Empty;
+                                    switch (item.ContentType)
+                                    {
+                                        case "audio/ogg":
+                                            extension = "ogg";
+                                            break;
+                                        case "application/zip":
+                                            extension = "zip";
+                                            break;
+                                        default:
+                                            extension = "none";
+                                            break;
+                                    }
 
-                                CloudBlockBlob convesrationBlob = container.GetBlockBlobReference($"{item.ConversationId}-{item.RecordingId}.{extension}");
-                                await convesrationBlob.StartCopyAsync(new Uri(item.ResultUrl));
-                            }
-                            else
-                            {
-                                CloudBlockBlob convesrationBlob = container.GetBlockBlobReference($"{item.ConversationId}.error");
-                                await convesrationBlob.UploadTextAsync(JsonConvert.SerializeObject(item));
+                                    CloudBlockBlob convesrationBlob = container.GetBlockBlobReference($"{item.ConversationId}-{item.RecordingId}.{extension}");
+                                    await convesrationBlob.StartCopyAsync(new Uri(item.ResultUrl));
+                                }
+                                else
+                                {
+                                    CloudBlockBlob convesrationBlob = container.GetBlockBlobReference($"{item.ConversationId}.error");
+                                    await convesrationBlob.UploadTextAsync(JsonConvert.SerializeObject(item));
+                                }
                             }
                         }
+                        //await Task.WhenAll(taskList.ToArray()); // to mutch performatic kkkk :P
                     }
-                    //await Task.WhenAll(taskList.ToArray()); // to mutch performatic kkkk :P
+
                 }
                 else
                 {
