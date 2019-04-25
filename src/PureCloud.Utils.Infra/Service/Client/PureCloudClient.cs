@@ -100,9 +100,9 @@ namespace PureCloud.Utils.Infra.Service.Client
                         response = JsonConvert.DeserializeObject<AnalyticsConversationQueryResponse>(jsonMessage);
                         if (response.Conversations != null) result = response.Conversations;
                     }
-                    else if (responseMessage.StatusCode.Equals(429))
+                    else if (responseMessage.StatusCode == HttpStatusCode.TooManyRequests)
                     {
-                        await DeplayTime(responseMessage);
+                        await DelayTime(responseMessage);
                     }
                     else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
                     {
@@ -149,9 +149,9 @@ namespace PureCloud.Utils.Infra.Service.Client
                     {
                         result = JsonConvert.DeserializeObject<BatchDownloadJobSubmissionResult>(jsonMessage);
                     }
-                    else if (responseMessage.StatusCode.Equals(429))
+                    else if (responseMessage.StatusCode == HttpStatusCode.TooManyRequests)
                     {
-                        await DeplayTime(responseMessage);
+                        await DelayTime(responseMessage);
                     }
                     else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
                     {
@@ -190,9 +190,9 @@ namespace PureCloud.Utils.Infra.Service.Client
                 {
                     result = JsonConvert.DeserializeObject<BatchDownloadJobStatusResult>(jsonMessage);
                 }
-                else if (responseMessage.StatusCode.Equals(429))
+                else if (responseMessage.StatusCode == HttpStatusCode.TooManyRequests)
                 {
-                    await DeplayTime(responseMessage);
+                    await DelayTime(responseMessage);
                 }
                 else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
                 {
@@ -247,13 +247,14 @@ namespace PureCloud.Utils.Infra.Service.Client
             return result;
         }
 
-        private static async Task DeplayTime(HttpResponseMessage responseMessage)
+        private static async Task DelayTime(HttpResponseMessage responseMessage)
         {
             HttpHeaders headers = responseMessage.Headers;
-            if (headers.TryGetValues("retry-after", out IEnumerable<string> values))
+            if (headers.TryGetValues("retry-after", out IEnumerable<string> values) |
+                headers.TryGetValues("inin-ratelimit-reset", out IEnumerable<string> values2))
             {
-                string redotime = values.First();
-                await Task.Delay(Convert.ToInt32(redotime) * 1000);
+                int redotime = Convert.ToInt32(values.FirstOrDefault()) + Convert.ToInt32(values2.FirstOrDefault());
+                await Task.Delay(redotime * 1000);
             }
         }
 
