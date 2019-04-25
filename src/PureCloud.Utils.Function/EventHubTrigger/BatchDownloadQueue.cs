@@ -3,7 +3,6 @@ using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.ServiceBus;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using PureCloud.Utils.Infra.Service.Client;
 using PureCloudPlatform.Client.V2.Model;
 using System;
@@ -24,15 +23,13 @@ namespace PureCloud.Utils.Function.EventHubTrigger
         {
             try
             {
-                List<AnalyticsConversation> conversations = new List<AnalyticsConversation>();
+                List<string> conversations = new List<string>();
 
                 // TODO: get list of convesations from "eventHub"
                 foreach (EventData eventData in events)
                 {
                     string messageBody = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
-
-                    AnalyticsConversation conversation = JsonConvert.DeserializeObject<AnalyticsConversation>(messageBody);
-                    conversations.Add(conversation);
+                    conversations.Add(messageBody);
                     //await Task.Yield();
                 }
 
@@ -44,7 +41,7 @@ namespace PureCloud.Utils.Function.EventHubTrigger
                 BatchDownloadJobSubmissionResult job = await purecloudClient.BatchRecordingDownloadByConversation(conversations);
 
                 // TODO: add in "jobQueue"
-                await jobQueue.AddAsync(JsonConvert.SerializeObject(job));
+                await jobQueue.AddAsync(job.Id);
             }
             catch (Exception ex)
             {

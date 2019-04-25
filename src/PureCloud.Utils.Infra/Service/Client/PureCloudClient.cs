@@ -117,7 +117,7 @@ namespace PureCloud.Utils.Infra.Service.Client
         /// </summary>
         /// <param name="conversationId">String, conversation id</param>
         /// <returns>BatchDownloadJobSubmissionResult, Job result object</returns>
-        public async Task<BatchDownloadJobSubmissionResult> BatchRecordingDownloadByConversation(List<AnalyticsConversation> conversations)
+        public async Task<BatchDownloadJobSubmissionResult> BatchRecordingDownloadByConversation(List<string> conversations)
         {
             BatchDownloadJobSubmissionResult result = new BatchDownloadJobSubmissionResult();
 
@@ -130,9 +130,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                 BatchDownloadJobSubmission queryParam = new BatchDownloadJobSubmission
                 {
                     BatchDownloadRequestList = conversations
-                        .Select(c => new BatchDownloadRequest() {
-                            ConversationId = c.ConversationId
-                        }).ToList()
+                        .Select(c => new BatchDownloadRequest() { ConversationId = c }).ToList()
                 };
 
                 int tentatives = 0;

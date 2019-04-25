@@ -24,7 +24,7 @@ namespace PureCloud.Utils.Domain.Interfaces.Services
         /// </summary>
         /// <param name="conversationId">String, conversation id</param>
         /// <returns>BatchDownloadJobSubmissionResult, Job result object</returns>
-        Task<BatchDownloadJobSubmissionResult> BatchRecordingDownloadByConversation(List<AnalyticsConversation> conversations);
+        Task<BatchDownloadJobSubmissionResult> BatchRecordingDownloadByConversation(List<string> conversations);
 
         /// <summary>
         /// Check job batch recordings download results.

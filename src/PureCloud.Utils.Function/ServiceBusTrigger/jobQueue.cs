@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 using PureCloud.Utils.Infra.Service.Client;
 using PureCloudPlatform.Client.V2.Model;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PureCloud.Utils.Function.ServiceBusTrigger
@@ -16,7 +15,7 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
     {
         [FunctionName("JobQueue")]
         public static async Task RunAsync(
-            [ServiceBusTrigger("jobqueue", Connection = "ServiceBusConnectionString")]string jobJson,
+            [ServiceBusTrigger("jobqueue", Connection = "ServiceBusConnectionString")]string jobId,
             [ServiceBus("jobqueue", Connection = "ServiceBusConnectionString", EntityType = EntityType.Queue)]IAsyncCollector<string> jobQueue,
             [Blob("conversation", Connection = "StorageConnectionString")] CloudBlobContainer container,
             ILogger log)
@@ -25,12 +24,10 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
             {
                 await container.CreateIfNotExistsAsync();
 
-                BatchDownloadJobSubmissionResult job = JsonConvert.DeserializeObject<BatchDownloadJobSubmissionResult>(jobJson);
-
                 // TODO: read from "jobQueue"
                 PureCloudClient purecloudClient = new PureCloudClient();
                 await purecloudClient.GetAccessToken();
-                BatchDownloadJobStatusResult batch = await purecloudClient.GetJobRecordingDownloadResultByConversation(job.Id);
+                BatchDownloadJobStatusResult batch = await purecloudClient.GetJobRecordingDownloadResultByConversation(jobId);
 
                 // TODO: end when resultcount == resultaudios
                 if (batch.ExpectedResultCount.Equals(batch.ResultCount))
@@ -71,7 +68,7 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                 else
                 {
                     // TODO: else, return item to jobQueue for next tentative
-                    await jobQueue.AddAsync(jobJson);
+                    await jobQueue.AddAsync(jobId);
                 }
             }
             catch (Exception ex)
@@ -86,7 +83,7 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                     {
                         await Task.Delay(Convert.ToInt32(Environment.GetEnvironmentVariable("deplaytime")));
 
-                        await jobQueue.AddAsync(jobJson);
+                        await jobQueue.AddAsync(jobId);
                         break;
                     }
                     catch { }
