@@ -31,7 +31,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
                 {
                     actualDate = new DatePage()
                     {
-                        Date = new DateTime(2019, 03, 01),
+                        Date = new DateTime(2016, 08, 01),
                         Page = 1
                     };
                 }
