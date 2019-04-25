@@ -4,9 +4,14 @@
     <AzureFunctionsVersion>V2</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Service\Storage\**" />
+    <EmbeddedResource Remove="Service\Storage\**" />
+    <None Remove="Service\Storage\**" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="3.0.5" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="PureCloudPlatform.Client.V2" Version="56.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="PureCloudPlatform.Client.V2" Version="57.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PureCloud.Utils.Domain\PureCloud.Utils.Domain.csproj" />

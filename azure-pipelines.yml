@@ -19,8 +19,8 @@ resources:
 jobs:
 - template: templates/function-build.yml
   parameters:
-    name: FunctionName
+    name: PureCloudUtilsFunction
     vmImage: 'Ubuntu-16.04'
-    projectPath: '**/*.Function.[NAME].csproj'
+    projectPath: '**/*.Function.csproj'
     buildConfiguration: 'Release'
     artifactstagingdirectory: $(build.artifactstagingdirectory)

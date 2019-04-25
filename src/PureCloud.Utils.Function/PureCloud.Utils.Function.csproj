@@ -4,9 +4,24 @@
     <AzureFunctionsVersion>V2</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="ServiceBusTrigger\**" />
+    <EmbeddedResource Remove="ServiceBusTrigger\**" />
+    <None Remove="ServiceBusTrigger\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="TimeTrigger\ConversationRecovery.cs" />
+    <Compile Remove="TimeTrigger\RecordingDownload.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ServiceBusTrigger\ConversationQueue.cs" />
+    <Compile Include="ServiceBusTrigger\jobQueue.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.9.1" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.26" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventHubs" Version="3.0.4" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="3.0.4" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.27" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PureCloud.Utils.Domain\PureCloud.Utils.Domain.csproj" />

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PureCloud.Utils.Domain.Interfaces.Services;
-using PureCloud.Utils.Infra.Service.Storage;
 using PureCloudPlatform.Client.V2.Extensions;
 using PureCloudPlatform.Client.V2.Model;
 
@@ -44,15 +44,13 @@ namespace PureCloud.Utils.Infra.Service.Client
                 FormUrlEncodedContent content = new FormUrlEncodedContent(dc);
 
                 HttpResponseMessage responseMessage = await hc.PostAsync(_uritoken, content);
-
-                if (responseMessage.StatusCode == HttpStatusCode.OK)
-                {
-                    string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
+                string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
+                if (responseMessage.IsSuccessStatusCode)
+                {                  
                     access_tokenInfo = JsonConvert.DeserializeObject<AuthTokenInfo>(jsonMessage);
                 }
                 else {
-                    await BlobStorageService.AddToErrorAsync(
-                        JsonConvert.SerializeObject(responseMessage), "getaccesstoken", $"{DateTime.Now}.json");
+                    throw new Exception(jsonMessage);
                 }
             }
 
@@ -96,21 +94,18 @@ namespace PureCloud.Utils.Infra.Service.Client
                 do 
                 {
                     string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
-                    if (responseMessage.StatusCode == HttpStatusCode.OK)
+                    if (responseMessage.IsSuccessStatusCode)
                     {
                         response = JsonConvert.DeserializeObject<AnalyticsConversationQueryResponse>(jsonMessage);
                         if (response.Conversations != null) result = response.Conversations;
                     }
                     else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
                     {
-                        await BlobStorageService.AddToErrorAsync(
-                                JsonConvert.SerializeObject(responseMessage), "getconversationsnyinterval", $"{begin.Date}.json");
-
-                        return new List<AnalyticsConversation>();
+                        throw new Exception(jsonMessage);
                     }
 
                     tentatives++;
-                } while (responseMessage.StatusCode != HttpStatusCode.OK && tentatives < 3);
+                } while (!responseMessage.IsSuccessStatusCode && tentatives < 3);
             }
 
             return result;
@@ -122,7 +117,7 @@ namespace PureCloud.Utils.Infra.Service.Client
         /// </summary>
         /// <param name="conversationId">String, conversation id</param>
         /// <returns>BatchDownloadJobSubmissionResult, Job result object</returns>
-        public async Task<BatchDownloadJobSubmissionResult> BatchRecordingDownloadByConversation(string conversationId)
+        public async Task<BatchDownloadJobSubmissionResult> BatchRecordingDownloadByConversation(List<AnalyticsConversation> conversations)
         {
             BatchDownloadJobSubmissionResult result = new BatchDownloadJobSubmissionResult();
 
@@ -134,9 +129,10 @@ namespace PureCloud.Utils.Infra.Service.Client
                 HttpResponseMessage responseMessage = new HttpResponseMessage();
                 BatchDownloadJobSubmission queryParam = new BatchDownloadJobSubmission
                 {
-                    BatchDownloadRequestList = new List<BatchDownloadRequest>() {
-                        new BatchDownloadRequest() { ConversationId = conversationId }
-                    }
+                    BatchDownloadRequestList = conversations
+                        .Select(c => new BatchDownloadRequest() {
+                            ConversationId = c.ConversationId
+                        }).ToList()
                 };
 
                 int tentatives = 0;
@@ -146,20 +142,17 @@ namespace PureCloud.Utils.Infra.Service.Client
                     new StringContent(queryParam.ToJson(), Encoding.UTF8, "application/json"));
 
                     string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
-                    if (responseMessage.StatusCode == HttpStatusCode.OK)
+                    if (responseMessage.IsSuccessStatusCode)
                     {
                         result = JsonConvert.DeserializeObject<BatchDownloadJobSubmissionResult>(jsonMessage);
                     }
                     else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
                     {
-                        await BlobStorageService.AddToErrorAsync(
-                                JsonConvert.SerializeObject(responseMessage), "batchrecordingdownloadbyconversation", $"{conversationId}.json");
-
-                        return result;
+                        throw new Exception(jsonMessage);
                     }
 
                     tentatives++;
-                } while (responseMessage.StatusCode != HttpStatusCode.OK && tentatives < 3);
+                } while (!responseMessage.IsSuccessStatusCode && tentatives < 3);
             }
 
             return result;
@@ -181,25 +174,19 @@ namespace PureCloud.Utils.Infra.Service.Client
                 hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                 HttpResponseMessage responseMessage = new HttpResponseMessage();
-                do
+                
+                Task.Delay(3000).Wait();
+                responseMessage = await hc.GetAsync(_uribase + $"/api/v2/recording/batchrequests/{jobId}");
+
+                string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
+                if (responseMessage.IsSuccessStatusCode)
                 {
-                    Task.Delay(3000).Wait();
-                    responseMessage = await hc.GetAsync(_uribase + $"/api/v2/recording/batchrequests/{jobId}");
-
-                    string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
-                    if (responseMessage.StatusCode == HttpStatusCode.OK)
-                    {
-                        result = JsonConvert.DeserializeObject<BatchDownloadJobStatusResult>(jsonMessage);
-                    }
-                    else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
-                    {
-                        await BlobStorageService.AddToErrorAsync(
-                            JsonConvert.SerializeObject(responseMessage), "getjobrecordingdownloadresultbyconversation", $"{jobId}.json");
-
-                        return result;
-                    }
-
-                } while (!result.ExpectedResultCount.Equals(result.ResultCount)); // ATENTION POUINT!!!
+                    result = JsonConvert.DeserializeObject<BatchDownloadJobStatusResult>(jsonMessage);
+                }
+                else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
+                {
+                    throw new Exception(jsonMessage);
+                }
             }
 
             return result;
@@ -227,7 +214,7 @@ namespace PureCloud.Utils.Infra.Service.Client
                         $"/api/v2/users?pageSize={_pageUserSize}&pageNumber={pageNumber}");
 
                     string jsonMessage = await responseMessage.Content.ReadAsStringAsync();
-                    if (responseMessage.StatusCode == HttpStatusCode.OK)
+                    if (responseMessage.IsSuccessStatusCode)
                     {
                         response = JsonConvert.DeserializeObject<UserEntityListing>(jsonMessage);
 
@@ -238,12 +225,9 @@ namespace PureCloud.Utils.Infra.Service.Client
 
                         pageNumber++;
                     }
-
                     else if ((int)responseMessage.StatusCode >= 300 && (int)responseMessage.StatusCode < 600)
                     {
-                        await BlobStorageService.AddToErrorAsync(
-                            JsonConvert.SerializeObject(responseMessage), "getavailableusers", $"{DateTime.Now}.json");
-                        return result;
+                        throw new Exception(jsonMessage);
                     }
 
                 } while (!response.Entities.Count.Equals(0));
