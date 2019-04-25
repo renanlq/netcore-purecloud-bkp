@@ -63,15 +63,21 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
             }
             catch (Exception ex)
             {
-                await Task.Delay(Convert.ToInt32(Environment.GetEnvironmentVariable("deplaytime")));
-
-                await pageQueue.AddAsync(pageJson);
-
-                log.LogInformation($"Exception: {ex.Message}");
-
                 TelemetryClient telemetry = new TelemetryClient();
                 telemetry.InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
                 telemetry.TrackException(ex);
+
+                do
+                {
+                    try
+                    {
+                        await pageQueue.AddAsync(pageJson);
+                        break;
+                    }
+                    catch {
+                        await Task.Delay(Convert.ToInt32(Environment.GetEnvironmentVariable("deplaytime")));
+                    }
+                } while (true);
             }
         }
     }

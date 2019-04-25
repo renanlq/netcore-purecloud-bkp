@@ -58,8 +58,6 @@ namespace PureCloud.Utils.Function.TimeTrigger
             }
             catch (Exception ex)
             {
-                log.LogInformation($"Exception: {ex.Message}");
-
                 TelemetryClient telemetry = new TelemetryClient();
                 telemetry.InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
                 telemetry.TrackException(ex);

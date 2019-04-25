@@ -48,21 +48,28 @@ namespace PureCloud.Utils.Function.EventHubTrigger
             }
             catch (Exception ex)
             {
-                await Task.Delay(Convert.ToInt32(Environment.GetEnvironmentVariable("deplaytime")));
-
-                List<Task> taskList = new List<Task>();
-                foreach (EventData eventData in events)
-                {
-                    string messageBody = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
-                    taskList.Add(convesationhub.AddAsync(messageBody));
-                }
-                await Task.WhenAll(taskList);
-
-                log.LogInformation($"Exception: {ex.Message}");
-
                 TelemetryClient telemetry = new TelemetryClient();
                 telemetry.InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
                 telemetry.TrackException(ex);
+
+                do
+                {
+                    try
+                    {
+                        List<Task> taskList = new List<Task>();
+                        foreach (EventData eventData in events)
+                        {
+                            string messageBody = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
+                            taskList.Add(convesationhub.AddAsync(messageBody));
+                        }
+                        await Task.WhenAll(taskList);
+                        break;
+                    }
+                    catch
+                    {
+                        await Task.Delay(Convert.ToInt32(Environment.GetEnvironmentVariable("deplaytime")));
+                    }
+                } while (true);               
             }
         }
     }
