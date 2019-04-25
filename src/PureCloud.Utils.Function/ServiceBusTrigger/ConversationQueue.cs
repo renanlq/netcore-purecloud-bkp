@@ -18,7 +18,7 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
         [FunctionName("ConversationQueue")]
         public static async Task RunAsync(
             [ServiceBusTrigger("pagequeue", Connection = "ServiceBusConnectionString")]string pageJson,
-            [EventHub("convesationhub", Connection = "EventhubConnectionString")]IAsyncCollector<string> convesationhub,
+            [EventHub("conversationhub", Connection = "EventhubConnectionString")]IAsyncCollector<string> conversationhub,
             [ServiceBus("pagequeue", Connection = "ServiceBusConnectionString", EntityType = EntityType.Queue)]IAsyncCollector<string> pageQueue,
             [Blob("conversation", Connection = "StorageConnectionString")] CloudBlobContainer container,
             ILogger log)
@@ -43,7 +43,7 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                 foreach (var item in conversations)
                 {
                     string conversationJson = JsonConvert.SerializeObject(item);
-                    await convesationhub.AddAsync(item.ConversationId);
+                    await conversationhub.AddAsync(item.ConversationId);
 
                     // add conversationJson to blob storage
                     CloudBlockBlob convesrationBlob = container.GetBlockBlobReference($"{item.ConversationId}-conversation.json");

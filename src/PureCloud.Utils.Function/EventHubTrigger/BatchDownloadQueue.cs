@@ -16,8 +16,8 @@ namespace PureCloud.Utils.Function.EventHubTrigger
     {
         [FunctionName("BatchDownloadQueue")]
         public static async void Run(
-            [EventHubTrigger("convesationhub", Connection = "EventhubConnectionString")]EventData[] events,
-            [EventHub("convesationhub", Connection = "EventhubConnectionString")]IAsyncCollector<string> convesationhub,
+            [EventHubTrigger("conversationhub", Connection = "EventhubConnectionString")]EventData[] events,
+            [EventHub("conversationhub", Connection = "EventhubConnectionString")]IAsyncCollector<string> conversationhub,
             [ServiceBus("jobqueue", Connection = "ServiceBusConnectionString", EntityType = EntityType.Queue)]IAsyncCollector<string> jobQueue,
             ILogger log)
         {
@@ -25,7 +25,7 @@ namespace PureCloud.Utils.Function.EventHubTrigger
             {
                 List<string> conversations = new List<string>();
 
-                // TODO: get list of convesations from "eventHub"
+                // TODO: get list of conversations from "eventHub"
                 foreach (EventData eventData in events)
                 {
                     string messageBody = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
@@ -59,7 +59,7 @@ namespace PureCloud.Utils.Function.EventHubTrigger
                         foreach (EventData eventData in events)
                         {
                             string messageBody = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
-                            await convesationhub.AddAsync(messageBody);
+                            await conversationhub.AddAsync(messageBody);
                         }
                         //await Task.WhenAll(taskList); // to mutch performatic kkkk :P
                         break;
