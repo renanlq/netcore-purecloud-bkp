@@ -48,6 +48,8 @@ namespace PureCloud.Utils.Function.EventHubTrigger
             }
             catch (Exception ex)
             {
+                await Task.Delay(Convert.ToInt32(Environment.GetEnvironmentVariable("deplaytime")));
+
                 List<Task> taskList = new List<Task>();
                 foreach (EventData eventData in events)
                 {

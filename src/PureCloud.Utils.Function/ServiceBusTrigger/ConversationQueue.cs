@@ -63,6 +63,8 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
             }
             catch (Exception ex)
             {
+                await Task.Delay(Convert.ToInt32(Environment.GetEnvironmentVariable("deplaytime")));
+
                 await pageQueue.AddAsync(pageJson);
 
                 log.LogInformation($"Exception: {ex.Message}");

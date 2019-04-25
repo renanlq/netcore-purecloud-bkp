@@ -31,7 +31,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
                 {
                     actualDate = new DatePage()
                     {
-                        Date = new DateTime(2016, 08, 01),
+                        Date = DateTime.Parse(Environment.GetEnvironmentVariable("initialdate")),
                         Page = 1
                     };
                 }
@@ -50,11 +50,10 @@ namespace PureCloud.Utils.Function.TimeTrigger
 
                     TableOperation operation = TableOperation.Insert(actualDate);
                     operation.Entity.PartitionKey = "purecloud";
-                    operation.Entity.RowKey = Guid.NewGuid().ToString();
-
-                    log.LogInformation($"Add date: {actualDate.Date} to datepage table");
-
+                    operation.Entity.RowKey = Guid.NewGuid().ToString();                  
                     await dateTable.ExecuteAsync(operation);
+
+                    log.LogInformation($"Added date: {actualDate.Date} to datepage table");
                 }
             }
             catch (Exception ex)
