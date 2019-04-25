@@ -71,12 +71,11 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                 {
                     try
                     {
+                        await Task.Delay(Convert.ToInt32(Environment.GetEnvironmentVariable("deplaytime")));
                         await pageQueue.AddAsync(pageJson);
                         break;
                     }
-                    catch {
-                        await Task.Delay(Convert.ToInt32(Environment.GetEnvironmentVariable("deplaytime")));
-                    }
+                    catch { }
                 } while (true);
             }
         }
