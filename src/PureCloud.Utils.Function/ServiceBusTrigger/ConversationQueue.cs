@@ -25,7 +25,7 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
         {
             try
             {
-                await container.CreateIfNotExistsAsync();
+                //await container.CreateIfNotExistsAsync(); // create before execution, to avoid overhead proccess
 
                 // TODO: read from "pageQueue"
                 DatePage datePage = new DatePage(pageJson);
@@ -77,7 +77,11 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                         await pageQueue.AddAsync(pageJson);
                         break;
                     }
-                    catch { }
+                    catch (Exception exEx)
+                    {
+                        telemetry.InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
+                        telemetry.TrackException(exEx);
+                    }
                 } while (true);
             }
         }

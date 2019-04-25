@@ -66,7 +66,11 @@ namespace PureCloud.Utils.Function.EventHubTrigger
                         //await Task.WhenAll(taskList); // to mutch performatic kkkk :P
                         break;
                     }
-                    catch { }
+                    catch (Exception exEx)
+                    {
+                        telemetry.InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
+                        telemetry.TrackException(exEx);
+                    }
                 } while (true);               
             }
         }

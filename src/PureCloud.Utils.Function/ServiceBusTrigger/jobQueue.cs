@@ -22,7 +22,7 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
         {
             try
             {
-                await container.CreateIfNotExistsAsync();
+                //await container.CreateIfNotExistsAsync(); // create before execution, to avoid overhead proccess
 
                 // TODO: read from "jobQueue"
                 PureCloudClient purecloudClient = new PureCloudClient();
@@ -92,7 +92,10 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                         await jobQueue.AddAsync(jobId);
                         break;
                     }
-                    catch { }
+                    catch (Exception exEx) {
+                        telemetry.InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
+                        telemetry.TrackException(exEx);
+                    }
                 } while (true);
             }
         }

@@ -20,7 +20,7 @@ namespace PureCloud.Utils.Function.TimeTrigger
         {
             try
             {
-                await dateTable.CreateIfNotExistsAsync();
+                //await dateTable.CreateIfNotExistsAsync(); // create before execution, to avoid overhead proccess
 
                 // TODO: read from date page table
                 TableQuery<DatePage> query = new TableQuery<DatePage>();

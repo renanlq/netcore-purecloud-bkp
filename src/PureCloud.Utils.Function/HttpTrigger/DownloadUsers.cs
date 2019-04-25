@@ -27,7 +27,7 @@ namespace PureCloud.Utils.Function.HttpTrigger
         {
             try
             {
-                await userTable.CreateIfNotExistsAsync();
+                //await userTable.CreateIfNotExistsAsync(); // create before execution, to avoid overhead proccess
 
                 PureCloudClient purecloudClient = new PureCloudClient();
                 await purecloudClient.GetAccessToken();
