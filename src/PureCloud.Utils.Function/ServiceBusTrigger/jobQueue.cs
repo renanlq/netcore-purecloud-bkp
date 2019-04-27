@@ -29,6 +29,8 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                 await purecloudClient.GetAccessToken();
                 BatchDownloadJobStatusResult batch = await purecloudClient.GetJobRecordingDownloadResultByConversation(jobId);
 
+                log.LogInformation($"Result forjob: ExpectedResultCound({batch.ExpectedResultCount}) and ResultCount({batch.ResultCount})");
+
                 // TODO: end when resultcount == resultaudios
                 if (!batch.ExpectedResultCount.Equals(0) && batch.ExpectedResultCount.Equals(batch.ResultCount))
                 {
@@ -73,6 +75,7 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                 {
                     // TODO: else, return item to jobQueue for next tentative
                     await jobQueue.AddAsync(jobId);
+                    log.LogInformation($"JobId: {jobId} re added to jobQueue");
                 }
             }
             catch (Exception ex)
@@ -88,13 +91,17 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                     try
                     {
                         await Task.Delay(Convert.ToInt32(Environment.GetEnvironmentVariable("deplaytime")));
-
                         await jobQueue.AddAsync(jobId);
+
+                        log.LogInformation($"Readded jobId: {jobId} to jobQueue");
+
                         break;
                     }
                     catch (Exception exEx) {
                         telemetry.InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
                         telemetry.TrackException(exEx);
+
+                        log.LogInformation($"Exception during execution: {exEx.Message}");
                     }
                 } while (true);
             }

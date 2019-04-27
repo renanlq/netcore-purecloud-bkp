@@ -62,14 +62,19 @@ namespace PureCloud.Utils.Function.EventHubTrigger
                         {
                             string messageBody = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
                             await conversationhub.AddAsync(messageBody);
+
+                            log.LogInformation($"Readded conversation: {messageBody} to conversationhub");
                         }
                         //await Task.WhenAll(taskList); // to mutch performatic kkkk :P
+
                         break;
                     }
                     catch (Exception exEx)
                     {
                         telemetry.InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
                         telemetry.TrackException(exEx);
+
+                        log.LogInformation($"Exception during execution: {exEx.Message}");
                     }
                 } while (true);               
             }

@@ -75,12 +75,17 @@ namespace PureCloud.Utils.Function.ServiceBusTrigger
                     {
                         await Task.Delay(Convert.ToInt32(Environment.GetEnvironmentVariable("deplaytime")));
                         await pageQueue.AddAsync(pageJson);
+
+                        log.LogInformation($"Readded pageJson: {pageJson} to pageQueue");
+
                         break;
                     }
                     catch (Exception exEx)
                     {
                         telemetry.InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
                         telemetry.TrackException(exEx);
+
+                        log.LogInformation($"Exception during execution: {exEx.Message}");
                     }
                 } while (true);
             }

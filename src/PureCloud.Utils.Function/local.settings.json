@@ -5,7 +5,7 @@
     "APPINSIGHTS_INSTRUMENTATIONKEY": "3d1***3ce",
     "AzureWebJobsDashboard": "UseDevelopmentStorage=true",
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "deplaytime": 30000,
+    "delaytime": 30000,
     "EventhubConnectionString": null,
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
     "initialdate": "2016-08-01",
