@@ -1,4 +1,4 @@
-# PureCloud Utils (Azure Functions)
+# PureCloud Utils, Audio recording backup from API
 
 ## Summary
 * [Purpose](#purpose)
@@ -10,7 +10,7 @@
 * [Contribution](#Contribution)
 
 ## Purpose
-Add utilities to PureCloud using Azure functions.
+Backup audio recording from PureCloud conversations using PureCloud API.
 
 ## Solution
 v1:
