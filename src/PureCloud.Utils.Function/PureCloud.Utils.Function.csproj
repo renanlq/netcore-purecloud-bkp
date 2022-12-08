@@ -21,7 +21,7 @@
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventHubs" Version="3.0.4" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="3.0.4" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.27" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PureCloud.Utils.Domain\PureCloud.Utils.Domain.csproj" />
